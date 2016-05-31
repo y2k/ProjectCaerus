@@ -1,6 +1,9 @@
 package com.caerus
 
+import android.app.Application
+import android.app.caerusInitialize
 import android.os.Bundle
+import android.os.Looper
 import com.example.helloworld.MainActivity
 
 /**
@@ -8,15 +11,17 @@ import com.example.helloworld.MainActivity
  */
 fun main(args: Array<String>) {
     println("Started...")
-
-    val activity = MainActivity()
-    activity.invoke("onCreate", arrayOf(Bundle::class.java), null)
-
+    startActivity()
     println("Finished success")
 }
 
-fun MainActivity.invoke(methodName: String, argumentTypes: Array<Class<Bundle>>, vararg args: Any?) {
-    val method = javaClass.getDeclaredMethod(methodName, *argumentTypes)
-    method.isAccessible = true
-    method.invoke(this, *args)
+private fun startActivity() {
+    Looper.prepareMainLooper()
+
+    val app = Application()
+    app.onCreate()
+
+    val activity = MainActivity()
+    activity.caerusInitialize()
+    activity.invoke("onCreate", arrayOf(Bundle::class.java), null)
 }
