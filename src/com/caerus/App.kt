@@ -1,7 +1,7 @@
 package com.caerus
 
 import android.app.Application
-import android.app.caerusInitialize
+import android.app.attach
 import android.os.Bundle
 import android.os.Looper
 import com.example.helloworld.MainActivity
@@ -22,6 +22,6 @@ private fun startActivity() {
     app.onCreate()
 
     val activity = MainActivity()
-    activity.caerusInitialize()
+    activity.attach()
     activity.invoke("onCreate", arrayOf(Bundle::class.java), null)
 }
