@@ -8,8 +8,20 @@ import android.content.pm.ActivityInfo
  */
 
 fun Activity.attach() {
+    val systemContext = ContextImpl()
+    val pckInfo = LoadedApk(
+        null,
+        null,
+        systemContext,
+        null)
+
     val context = ContextImpl()
-    this.attach(
+    context.init(
+        pckInfo,
+        null,
+        null)
+
+    attach(
         context,
         null,
         null,
