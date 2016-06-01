@@ -732,7 +732,8 @@ public class Process {
      * 
      * {@hide}
      */
-    public static final native void setArgV0(String text);
+//    public static final native void setArgV0(String text);
+    public static final void setArgV0(String text) { }
 
     /**
      * Kill the process with the given PID.

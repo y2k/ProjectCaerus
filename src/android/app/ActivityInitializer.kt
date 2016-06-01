@@ -7,6 +7,10 @@ import android.content.pm.ActivityInfo
  * Created by y2k on 5/31/16.
  */
 
+fun preInit() {
+    ActivityThread.main(emptyArray())
+}
+
 fun Activity.attach() {
     val systemContext = ContextImpl()
     val pckInfo = LoadedApk(

@@ -2,6 +2,7 @@ package com.caerus
 
 import android.app.Application
 import android.app.attach
+import android.app.preInit
 import android.os.Bundle
 import android.os.Looper
 import com.example.helloworld.MainActivity
@@ -16,10 +17,12 @@ fun main(args: Array<String>) {
 }
 
 private fun startActivity() {
-    Looper.prepareMainLooper()
+//    Looper.prepareMainLooper()
+//
+//    val app = Application()
+//    app.onCreate()
 
-    val app = Application()
-    app.onCreate()
+    preInit()
 
     val activity = MainActivity()
     activity.attach()
