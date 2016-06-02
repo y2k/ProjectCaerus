@@ -61,7 +61,7 @@ public class Binder implements IBinder {
      * If the current thread is not currently executing an incoming transaction,
      * then its own pid is returned.
      */
-    public static final native int getCallingPid();
+    public static final int getCallingPid() { return 999; }
     
     /**
      * Return the ID of the user assigned to the process that sent you the
@@ -88,7 +88,7 @@ public class Binder implements IBinder {
      * @see #getCallingUid()
      * @see #restoreCallingIdentity(long)
      */
-    public static final native long clearCallingIdentity();
+    public static final long clearCallingIdentity() { return 0; }
 
     /**
      * Restore the identity of the incoming IPC on the current thread
@@ -100,7 +100,7 @@ public class Binder implements IBinder {
      *
      * @see #clearCallingIdentity
      */
-    public static final native void restoreCallingIdentity(long token);
+    public static final void restoreCallingIdentity(long token) {}
 
     /**
      * Sets the native thread-local StrictMode policy mask.
@@ -133,7 +133,7 @@ public class Binder implements IBinder {
      * in order to prevent the process from holding on to objects longer than
      * it needs to.
      */
-    public static final native void flushPendingCommands();
+    public static final void flushPendingCommands() {}
     
     /**
      * Add the calling thread to the IPC thread pool.  This function does

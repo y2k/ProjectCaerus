@@ -17,5 +17,6 @@
     <orderEntry type="library" name="hello-world" level="project" />
     <orderEntry type="library" name="android-2.3.7_r1" level="project" />
     <orderEntry type="library" name="opengl-api-gl1.1-android-2.1_r1" level="project" />
+    <orderEntry type="library" name="mockito-all-1.10.19" level="project" />
   </component>
 </module>

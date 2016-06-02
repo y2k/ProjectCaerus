@@ -20,6 +20,9 @@ import com.android.internal.os.BinderInternal;
 
 import android.util.Log;
 import com.android.server.am.ActivityManagerService;
+import org.mockito.Mockito;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 
 import java.io.FileDescriptor;
 import java.util.HashMap;
@@ -39,7 +42,8 @@ public final class ServiceManager {
         }
 
         // Find the service manager
-        sServiceManager = ServiceManagerNative.asInterface(BinderInternal.getContextObject());
+//        sServiceManager = ServiceManagerNative.asInterface(BinderInternal.getContextObject());
+        sServiceManager = new StubServiceManager();
         return sServiceManager;
     }
 
@@ -55,56 +59,9 @@ public final class ServiceManager {
             if (service != null) {
                 return service;
             } else {
-//                return getIServiceManager().getService(name);
-                service = new IBinder() {
-                    @Override
-                    public String getInterfaceDescriptor() throws RemoteException {
-                        throw new UnsupportedOperationException();
-                    }
-
-                    @Override
-                    public boolean pingBinder() {
-                        throw new UnsupportedOperationException();
-                    }
-
-                    @Override
-                    public boolean isBinderAlive() {
-                        throw new UnsupportedOperationException();
-                    }
-
-                    @Override
-                    public IInterface queryLocalInterface(String s) {
-                        if (Objects.equals(s, "android.app.IActivityManager")) {
-                            ActivityManagerService.main(0);
-                            return ActivityManagerService.self();
-                        }
-                        throw new UnsupportedOperationException("name = " + s);
-                    }
-
-                    @Override
-                    public void dump(FileDescriptor fileDescriptor, String[] strings) throws RemoteException {
-                        throw new UnsupportedOperationException();
-                    }
-
-                    @Override
-                    public boolean transact(int i, Parcel parcel, Parcel parcel1, int i1) throws RemoteException {
-                        throw new UnsupportedOperationException();
-                    }
-
-                    @Override
-                    public void linkToDeath(DeathRecipient deathRecipient, int i) throws RemoteException {
-                        throw new UnsupportedOperationException();
-                    }
-
-                    @Override
-                    public boolean unlinkToDeath(DeathRecipient deathRecipient, int i) {
-                        throw new UnsupportedOperationException();
-                    }
-                };
-                sCache.put(name, service);
-                return service;
+                return getIServiceManager().getService(name);
             }
-        } catch (RuntimeException e) {
+        } catch (RemoteException e) {
             Log.e(TAG, "error in getService", e);
         }
         return null;
