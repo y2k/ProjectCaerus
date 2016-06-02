@@ -575,7 +575,7 @@ public class Process {
      * Returns the identifier of this process, which can be used with
      * {@link #killProcess} and {@link #sendSignal}.
      */
-    public static final native int myPid();
+    public static final int myPid() { return 999; }
 
     /**
      * Returns the identifier of the calling thread, which be used with
@@ -639,7 +639,7 @@ public class Process {
      *
      * @hide
      */
-    public static final native void setCanSelfBackground(boolean backgroundOk);
+    public static final void setCanSelfBackground(boolean backgroundOk) {}
 
     /**
      * Sets the scheduling group for a thread.
@@ -685,8 +685,8 @@ public class Process {
      * 
      * @see #setThreadPriority(int, int)
      */
-    public static final native void setThreadPriority(int priority)
-            throws IllegalArgumentException, SecurityException;
+    public static final void setThreadPriority(int priority)
+            throws IllegalArgumentException, SecurityException {}
     
     /**
      * Return the current priority of a thread, based on Linux priorities.

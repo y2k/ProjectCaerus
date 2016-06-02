@@ -27,11 +27,16 @@ public class SystemProperties
 {
     public static final int PROP_NAME_MAX = 31;
     public static final int PROP_VALUE_MAX = 91;
+
     //    private static native String native_get(String key);
-    private static String native_get(String key) { return null; }
-    private static native String native_get(String key, String def);
+    private static String native_get(String key) { return "999"; }
+
+//    private static native String native_get(String key, String def);
+    private static String native_get(String key, String def) { return def; }
+
     //    private static native int native_get_int(String key, int def);
     private static  int native_get_int(String key, int def) { return def; }
+
     private static native long native_get_long(String key, long def);
     private static native boolean native_get_boolean(String key, boolean def);
     private static native void native_set(String key, String def);

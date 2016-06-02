@@ -2,13 +2,19 @@ package android.app
 
 import android.content.Intent
 import android.content.pm.ActivityInfo
+import com.android.server.am.ActivityManagerService
 
 /**
  * Created by y2k on 5/31/16.
  */
 
 fun preInit() {
+//    ActivityManagerService.main(0)
+
     ActivityThread.main(emptyArray())
+
+//    ActivityManagerService.getDefault()
+    ActivityManagerService.self()
 }
 
 fun Activity.attach() {
