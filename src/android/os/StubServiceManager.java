@@ -1,13 +1,23 @@
 package android.os;
 
+import android.content.pm.ApplicationInfo;
+import android.content.pm.IPackageManager;
+import android.content.pm.PackageInfo;
 import com.android.server.am.ActivityManagerService;
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
 import java.io.FileDescriptor;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
+
+import static org.mockito.Matchers.anyInt;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.when;
 
 /**
  * Created by y2k on 6/2/16.
@@ -36,9 +46,11 @@ public class StubServiceManager implements IServiceManager {
 
             @Override
             public IInterface queryLocalInterface(String s) {
-//                if (cache.containsKey(s)) return cache.get(s);
                 if (Objects.equals(s, "android.app.IActivityManager")) {
+
                     ActivityManagerService.main(0);
+                    ActivityManagerService.setSystemProcess();
+
                     return ActivityManagerService.self();
                 } else if (Objects.equals(s, "android.os.IPowerManager")) {
                     return Mockito.mock(
@@ -46,6 +58,19 @@ public class StubServiceManager implements IServiceManager {
                         (Answer) invocation -> {
                             throw new UnsupportedOperationException("method = " + invocation);
                         });
+                } else if (Objects.equals(s, "android.content.pm.IPackageManager")) {
+                    IPackageManager mock = Mockito.mock(
+                        IPackageManager.class,
+                        (Answer) invocation -> {
+                            throw new UnsupportedOperationException("method = " + invocation);
+                        });
+                    try {
+                        doReturn(new ApplicationInfo())
+                            .when(mock).getApplicationInfo(anyString(), anyInt());
+                    } catch (RemoteException e) {
+                        throw new RuntimeException(e);
+                    }
+                    return mock;
                 }
                 throw new UnsupportedOperationException("name = " + s);
             }

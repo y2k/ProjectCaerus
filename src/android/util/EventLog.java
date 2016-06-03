@@ -157,7 +157,7 @@ public class EventLog {
      */
     public static int writeEvent(int tag, int value) {
         System.out.println("EventLog: tag = " + tag + ", value = " + value);
-        throw new IllegalStateException();
+//        throw new IllegalStateException();
         return 8;
     }
 

@@ -586,7 +586,7 @@ public class Process {
     /**
      * Returns the identifier of this process's user.
      */
-    public static final native int myUid();
+    public static final int myUid() { return 1; }
 
     /**
      * Returns the UID assigned to a particular user name, or -1 if there is
@@ -722,7 +722,7 @@ public class Process {
      *         
      * {@hide}
      */
-    public static final native boolean setOomAdj(int pid, int amt);
+    public static final boolean setOomAdj(int pid, int amt){ return true;}
 
     /**
      * Change this process's argv[0] parameter.  This can be useful to show
@@ -762,7 +762,7 @@ public class Process {
      * @param pid The pid of the target process.
      * @param signal The signal to send.
      */
-    public static final native void sendSignal(int pid, int signal);
+    public static final void sendSignal(int pid, int signal) {}
     
     /**
      * @hide

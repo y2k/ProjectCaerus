@@ -694,9 +694,11 @@ public final class AssetManager {
     /*package*/ static final int STYLE_RESOURCE_ID = 3;
     /*package*/ static final int STYLE_CHANGING_CONFIGURATIONS = 4;
     /*package*/ static final int STYLE_DENSITY = 5;
-    /*package*/ native static final boolean applyStyle(int theme,
+
+    /*package*/ static final boolean applyStyle(int theme,
             int defStyleAttr, int defStyleRes, int xmlParser,
-            int[] inAttrs, int[] outValues, int[] outIndices);
+            int[] inAttrs, int[] outValues, int[] outIndices) { return true; }
+
     /*package*/ native final boolean retrieveAttributes(
             int xmlParser, int[] inAttrs, int[] outValues, int[] outIndices);
     /*package*/ native final int getArraySize(int resource);
@@ -724,10 +726,12 @@ public final class AssetManager {
      */
     public native static final int getGlobalAssetManagerCount();
     
-    private native final int newTheme();
+    private final int newTheme() { return 1; }
     private native final void deleteTheme(int theme);
-    /*package*/ native static final void applyThemeStyle(int theme, int styleRes, boolean force);
-    /*package*/ native static final void copyTheme(int dest, int source);
+
+    /*package*/ static final void applyThemeStyle(int theme, int styleRes, boolean force) {}
+
+    /*package*/ static final void copyTheme(int dest, int source) {}
     /*package*/ native static final int loadThemeAttributeValue(int theme, int ident,
                                                                 TypedValue outValue,
                                                                 boolean resolve);

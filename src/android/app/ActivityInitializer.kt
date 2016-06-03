@@ -2,34 +2,38 @@ package android.app
 
 import android.content.Intent
 import android.content.pm.ActivityInfo
-import com.android.server.am.ActivityManagerService
+import android.content.pm.ApplicationInfo
+import kotlin.concurrent.thread
 
 /**
  * Created by y2k on 5/31/16.
  */
 
-fun preInit() {
-//    ActivityManagerService.main(0)
-
+fun preInit(callback: () -> Unit) {
+    thread {
+        Thread.sleep(500)
+        ActivityThread.sMainThreadHandler.post(callback)
+    }
     ActivityThread.main(emptyArray())
-
-//    ActivityManagerService.getDefault()
-    ActivityManagerService.self()
 }
 
 fun Activity.attach() {
-    val systemContext = ContextImpl()
+    ContextImpl()
     val pckInfo = LoadedApk(
         null,
+        ApplicationInfo().apply {
+            // TODO
+        },
         null,
-        systemContext,
-        null)
+        javaClass.classLoader,
+        false,
+        false)
 
     val context = ContextImpl()
     context.init(
         pckInfo,
         null,
-        null)
+        ActivityThread.currentActivityThread())
 
     attach(
         context,

@@ -61,7 +61,7 @@ public class Binder implements IBinder {
      * If the current thread is not currently executing an incoming transaction,
      * then its own pid is returned.
      */
-    public static final int getCallingPid() { return 999; }
+    public static final int getCallingPid() { return 9999; }
     
     /**
      * Return the ID of the user assigned to the process that sent you the
