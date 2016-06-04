@@ -5,6 +5,7 @@ import android.content.pm.ApplicationInfo
 import android.content.res.CompatibilityInfo
 import android.content.res.Resources
 import android.content.res.TypedArray
+import android.graphics.Canvas
 import android.util.DisplayMetrics
 import android.widget.Button
 import org.junit.Test
@@ -39,6 +40,9 @@ class ButtonTest {
             mock(TypedArray::class.java)
         }
 
+        val canvas = mock(Canvas::class.java)
+
         val button = Button(context)
+        button.draw(canvas)
     }
 }

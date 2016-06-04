@@ -40,5 +40,14 @@
     <orderEntry type="library" scope="TEST" name="Gradle: org.powermock:powermock-api-support:1.6.5" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: org.powermock:powermock-api-mockito:1.6.5" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: org.powermock:powermock-api-mockito-common:1.6.5" level="project" />
+    <orderEntry type="module-library">
+      <library name="Gradle: opengl-api-gl1.1-android-2.1_r1">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../libs/opengl-api-gl1.1-android-2.1_r1.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
   </component>
 </module>

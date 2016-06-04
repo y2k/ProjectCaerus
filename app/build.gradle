@@ -20,7 +20,7 @@ repositories {
 }
 
 dependencies {
-    compile fileTree(dir: '../libs/android-2.3.7_r1.jar', include: ['android-2.3.7_r1.jar'])
+    compile fileTree(dir: '../libs', include: ['android-2.3.7_r1.jar', 'opengl-api-gl1.1-android-2.1_r1.jar'])
 
     compile "org.jetbrains.kotlin:kotlin-stdlib:1.0.2"
 
