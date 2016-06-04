@@ -398,7 +398,7 @@ public class Paint {
      * @param fakeBoldText true to set the fakeBoldText bit in the paint's
      *                     flags, false to clear it.
      */
-    public native void setFakeBoldText(boolean fakeBoldText);
+    public void setFakeBoldText(boolean fakeBoldText){}
 
     /**
      * Whether or not the bitmap filter is activated.
@@ -830,14 +830,14 @@ public class Paint {
      *
      * @return the paint's text size.
      */
-    public native float getTextSize();
+    public float getTextSize() {return 10;}
 
     /**
      * Set the paint's text size. This value must be > 0
      *
      * @param textSize set the paint's text size.
      */
-    public native void setTextSize(float textSize);
+    public void setTextSize(float textSize){}
 
     /**
      * Return the paint's horizontal scale factor for text. The default value
@@ -854,7 +854,7 @@ public class Paint {
      *
      * @param scaleX set the paint's scale in X for drawing/measuring text.
      */
-    public native void setTextScaleX(float scaleX);
+    public void setTextScaleX(float scaleX){}
 
     /**
      * Return the paint's horizontal skew factor for text. The default value
@@ -870,7 +870,7 @@ public class Paint {
      *
      * @param skewX set the paint's skew factor in X for drawing text.
      */
-    public native void setTextSkewX(float skewX);
+    public void setTextSkewX(float skewX){}
 
     /**
      * Return the distance above (negative) the baseline (ascent) based on the

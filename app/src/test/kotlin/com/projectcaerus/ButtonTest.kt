@@ -1,15 +1,16 @@
 package com.projectcaerus
 
 import android.content.Context
+import android.content.pm.ApplicationInfo
+import android.content.res.CompatibilityInfo
 import android.content.res.Resources
 import android.content.res.TypedArray
 import android.util.DisplayMetrics
 import android.widget.Button
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.AdditionalMatchers
-import org.mockito.Mockito
 import org.mockito.Mockito.*
+import org.powermock.api.mockito.PowerMockito
 import org.powermock.core.classloader.annotations.PrepareForTest
 import org.powermock.modules.junit4.PowerMockRunner
 
@@ -18,37 +19,26 @@ import org.powermock.modules.junit4.PowerMockRunner
 //
 
 @RunWith(PowerMockRunner::class)
-@PrepareForTest(Resources.Theme::class)
+@PrepareForTest(Resources.Theme::class, Context::class)
 class ButtonTest {
 
     @Test
     fun test() {
-        // TODO:
-
-        val context = mock(Context::class.java)
+        val context = PowerMockito.mock(Context::class.java)
         when_(context.resources).then {
             val resources = mock(Resources::class.java)
             when_(resources.displayMetrics).then {
                 DisplayMetrics()
             }
+            when_(resources.compatibilityInfo).then {
+                CompatibilityInfo(ApplicationInfo())
+            }
             resources
         }
-        when_(context.theme).then {
-            val theme = mock(Resources.Theme::class.java)
-//            when_(theme.obtainStyledAttributes(any(), any(), any(), any())).then {
-//                mock(TypedArray::class.java)
-//            }
-            theme
-        }
-        when_(context.obtainStyledAttributes(any(), any(IntArray::class.java), any(), any())).then {
+        when_(context.obtainStyledAttributes(any(), any(), anyInt(), anyInt())).then {
             mock(TypedArray::class.java)
         }
-//        Mockito.doAnswer {
-//            mock(TypedArray::class.java)
-//        }.`when`(context)
-//            .obtainStyledAttributes(any(),any(),any(),any())
 
-        Button(context)
-
+        val button = Button(context)
     }
 }
