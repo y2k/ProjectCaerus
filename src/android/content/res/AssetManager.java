@@ -20,6 +20,7 @@ import android.os.ParcelFileDescriptor;
 import android.util.Config;
 import android.util.Log;
 import android.util.TypedValue;
+import com.caerus.ResourceLoader;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -681,8 +682,10 @@ public final class AssetManager {
 
     /** Returns true if the resource was found, filling in mRetStringBlock and
      *  mRetData. */
-    private native final int loadResourceValue(int ident, TypedValue outValue,
-                                               boolean resolve);
+    private final int loadResourceValue(int ident, TypedValue outValue, boolean resolve) {
+        return ResourceLoader.INSTANCE.loadResourceValue(ident,outValue,resolve);
+    }
+
     /** Returns true if the resource was found, filling in mRetStringBlock and
      *  mRetData. */
     private native final int loadResourceBagValue(int ident, int bagEntryId, TypedValue outValue,
