@@ -1,0 +1,28 @@
+group 'com.projectcaerus'
+version '1.0-SNAPSHOT'
+
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.0.2"
+    }
+}
+
+apply plugin: 'java'
+apply plugin: 'kotlin'
+
+sourceCompatibility = 1.6
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile fileTree(dir: '../libs/android-2.3.7_r1.jar', include: ['android-2.3.7_r1.jar'])
+
+    compile "org.jetbrains.kotlin:kotlin-stdlib:1.0.2"
+    compile group: 'junit', name: 'junit', version: '4.11'
+    compile group: 'org.powermock', name: 'powermock-module-junit4', version: '1.6.5'
+}
