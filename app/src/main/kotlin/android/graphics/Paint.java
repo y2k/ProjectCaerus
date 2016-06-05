@@ -1406,8 +1406,14 @@ public class Paint {
                                                       FontMetrics metrics);
     private static native int native_getTextWidths(int native_object,
                                                    char[] text, int index, int count, float[] widths);
-    private static native int native_getTextWidths(int native_object,
-                                                   String text, int start, int end, float[] widths);
+
+    private static int native_getTextWidths(int native_object,
+                                                   String text, int start, int end, float[] widths) {
+        for (int n=0,i=start;i<end;i++,n++)
+            widths[n]=10;
+        return (end-start);
+    }
+
     private static native void native_getTextPath(int native_object,
                                                   char[] text, int index, int count, float x, float y, int path);
     private static native void native_getTextPath(int native_object,
