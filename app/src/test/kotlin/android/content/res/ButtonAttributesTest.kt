@@ -1,20 +1,25 @@
-package com.projectcaerus
+package android.content.res
 
 import android.content.Context
 import android.content.pm.ApplicationInfo
 import android.content.res.CompatibilityInfo
 import android.content.res.Resources
+import android.content.res.ThemeAttributeResolver
 import android.content.res.TypedArray
 import android.emoji.EmojiFactory
 import android.graphics.Canvas
 import android.util.AttributeSet
 import android.util.DisplayMetrics
+import android.util.TypedValue
 import android.view.View
 import android.widget.Button
+import com.projectcaerus.setFinalField
+import com.projectcaerus.when_
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito
+import org.mockito.Mockito.*
 import org.mockito.stubbing.Answer
 import org.powermock.api.mockito.PowerMockito
 import org.powermock.core.classloader.annotations.PrepareForTest
@@ -38,17 +43,26 @@ class ButtonAttributesTest {
 
         context = PowerMockito.mock(Context::class.java)
         when_(context.resources).then {
-            val resources = Mockito.mock(Resources::class.java)
+            val resources = mock(Resources::class.java)
+            setFinalField(resources, Resources::class.java.getDeclaredField("mTmpValue"), TypedValue())
+
             when_(resources.displayMetrics).then {
                 DisplayMetrics()
             }
             when_(resources.compatibilityInfo).then {
                 CompatibilityInfo(ApplicationInfo())
             }
+            when_(resources.loadDrawable(any(), anyInt())).then {
+                ThemeAttributeResolver(resources).loadDrawable(
+                    it.arguments[0] as TypedValue,
+                    it.arguments[1] as Int)
+            }
             resources
         }
-        when_(context.obtainStyledAttributes(Mockito.any(), Mockito.any(), Mockito.anyInt(), Mockito.anyInt())).then {
-            AttributeResolver.obtainStyledAttributes(
+
+        val themeAttributeResolver = ThemeAttributeResolver(context.resources)
+        when_(context.obtainStyledAttributes(any(), any(), anyInt(), anyInt())).then {
+            themeAttributeResolver.obtainStyledAttributes(
                 it.arguments[0] as AttributeSet?,
                 it.arguments[1] as IntArray,
                 it.arguments[2] as Int,
@@ -56,7 +70,7 @@ class ButtonAttributesTest {
             )
         }
 
-        canvas = Mockito.mock(Canvas::class.java, Answer {
+        canvas = mock(Canvas::class.java, Answer {
             println("called = " + it)
 
             if (it.method.name == "save") 1
@@ -76,6 +90,6 @@ class ButtonAttributesTest {
         button.layout(0, 0, virtScreen.first, virtScreen.second)
 
         button.draw(canvas)
-        canvas.setBitmap(null)
+//        canvas.setBitmap(null)
     }
 }
