@@ -463,7 +463,7 @@ public class Paint {
      *
      * @param color The new color (including alpha) to set in the paint.
      */
-    public native void setColor(int color);
+    public void setColor(int color){}
 
     /**
      * Helper to getColor() that just returns the color's alpha value. This is
@@ -970,7 +970,9 @@ public class Paint {
      *
      * @return the font's interline spacing.
      */
-    public native int getFontMetricsInt(FontMetricsInt fmi);
+    public int getFontMetricsInt(FontMetricsInt fmi) {
+        return 1;
+    }
 
     public FontMetricsInt getFontMetricsInt() {
         FontMetricsInt fm = new FontMetricsInt();
@@ -1025,7 +1027,9 @@ public class Paint {
         return w*mInvCompatScaling;
     }
 
-    private native float native_measureText(String text, int start, int end);
+    private float native_measureText(String text, int start, int end){
+        return (end-start)*10;
+    }
 
     /**
      * Return the width of the text.

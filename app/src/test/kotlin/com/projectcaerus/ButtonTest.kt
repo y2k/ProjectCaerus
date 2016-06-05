@@ -5,6 +5,7 @@ import android.content.pm.ApplicationInfo
 import android.content.res.CompatibilityInfo
 import android.content.res.Resources
 import android.content.res.TypedArray
+import android.emoji.EmojiFactory
 import android.graphics.Canvas
 import android.util.DisplayMetrics
 import android.widget.Button
@@ -20,11 +21,13 @@ import org.powermock.modules.junit4.PowerMockRunner
 //
 
 @RunWith(PowerMockRunner::class)
-@PrepareForTest(Resources.Theme::class, Context::class)
+@PrepareForTest(Resources.Theme::class, Context::class, EmojiFactory::class)
 class ButtonTest {
 
     @Test
     fun test() {
+        PowerMockito.mockStatic(EmojiFactory::class.java)
+
         val context = PowerMockito.mock(Context::class.java)
         when_(context.resources).then {
             val resources = mock(Resources::class.java)
