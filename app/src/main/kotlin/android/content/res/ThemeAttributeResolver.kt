@@ -1,12 +1,14 @@
 package android.content.res
 
 import android.graphics.drawable.Drawable
+import android.graphics.drawable.StateListDrawable
 import android.util.AttributeSet
 import android.util.TypedValue
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
 import org.jsoup.parser.Parser
+import org.kxml2.io.KXmlParser
 import java.io.File
 
 /**
@@ -27,11 +29,17 @@ class ThemeAttributeResolver(private val resources: Resources) {
         val bgName = public.select("public[type=drawable][id=${id.toHex()}]").first().attr("name")
         println("bgName = $bgName")
 
-        TODO("value = $value, id = $id")
+        File("../res/drawable/$bgName.xml").bufferedReader().use {
+            val parser = KXmlParser()
+            parser.setInput(it)
+            return StateListDrawable.createFromXml(resources, parser)
+        }
     }
 
     //        return this.getTheme().obtainStyledAttributes(set, attrs, defStyleAttr, defStyleRes)
     fun obtainStyledAttributes(set: AttributeSet?, attrs: IntArray, defStyleAttr: Int, defStyleRes: Int): TypedArray {
+        if (defStyleAttr == 0) return makeEmptyTypedArray(resources)
+
         val styleAttrName = public.select("public[id=${defStyleAttr.toHex()}]").first()
         if (styleAttrName.attr("type") != "attr") throw IllegalStateException()
 //        println("Attr name = " + styleAttrName.attr("name"))
@@ -44,7 +52,7 @@ class ThemeAttributeResolver(private val resources: Resources) {
         val bgIndex = public.select("public[type=drawable][name=$bgName]").first().index()
 //        println("bgIndex = " + bgIndex)
 
-        val index = getBackgroundIndex(attrs, "background") ?: return TypedArray(resources, IntArray(100), intArrayOf(0), 0)
+        val index = getAttrIndex(attrs, "background") ?: return makeEmptyTypedArray(resources)
 
         val data = IntArray((index + 1) * 6)
         data[6 * index] = TypedValue.TYPE_REFERENCE
@@ -54,16 +62,19 @@ class ThemeAttributeResolver(private val resources: Resources) {
         return result;
     }
 
-    private fun getBackgroundIndex(attrs: IntArray, name: String): Int? {
+
+    private fun getAttrIndex(attrs: IntArray, name: String): Int? {
         val index = public.select("public[type='attr'][name=$name]").first().index()
         return attrs.indexOf(index).let { if (it >= 0) it else null }
     }
+}
 
-    fun Element.index(): Int {
-        return attr("id").let { Integer.parseInt(it.substring(2), 16) }
-    }
+fun makeEmptyTypedArray(resources: Resources) = TypedArray(resources, IntArray(100), intArrayOf(0), 0)
 
-    fun Int.toHex(): String {
-        return String.format("0x%08X", this)
-    }
+fun Element.index(): Int {
+    return attr("id").let { Integer.parseInt(it.substring(2), 16) }
+}
+
+fun Int.toHex(): String {
+    return String.format("0x%08X", this)
 }

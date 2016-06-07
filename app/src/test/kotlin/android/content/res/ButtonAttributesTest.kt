@@ -2,10 +2,6 @@ package android.content.res
 
 import android.content.Context
 import android.content.pm.ApplicationInfo
-import android.content.res.CompatibilityInfo
-import android.content.res.Resources
-import android.content.res.ThemeAttributeResolver
-import android.content.res.TypedArray
 import android.emoji.EmojiFactory
 import android.graphics.Canvas
 import android.util.AttributeSet
@@ -18,7 +14,6 @@ import com.projectcaerus.when_
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.Mockito
 import org.mockito.Mockito.*
 import org.mockito.stubbing.Answer
 import org.powermock.api.mockito.PowerMockito
@@ -57,6 +52,12 @@ class ButtonAttributesTest {
                     it.arguments[0] as TypedValue,
                     it.arguments[1] as Int)
             }
+            when_(resources.obtainAttributes(any(), any()))
+                .then {
+                    ThemeAttributeResolver(resources).obtainStyledAttributes(
+                        it.arguments[0] as AttributeSet?,
+                        it.arguments[1] as IntArray, 0, 0)
+                }
             resources
         }
 
