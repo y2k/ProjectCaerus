@@ -4,12 +4,11 @@ import android.graphics.drawable.Drawable
 import android.graphics.drawable.StateListDrawable
 import android.util.AttributeSet
 import android.util.TypedValue
-import android.util.makeXmlPullAttributes
+import com.projectcaerus.NinePatchDrawable
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
 import org.jsoup.parser.Parser
-import org.kxml2.io.KXmlParser
 import java.io.File
 
 /**
@@ -30,11 +29,27 @@ class ThemeAttributeResolver(private val resources: Resources) {
         val bgName = public.select("public[type=drawable][id=${id.toHex()}]").first().attr("name")
         println("bgName = $bgName")
 
-        File("../res/drawable/$bgName.xml").bufferedReader().use {
-            val parser = ResourceParser(this)
-            parser.setInput(it)
-            return StateListDrawable.createFromXml(resources, parser)
+        val pathToResource = getPathToResource(bgName)
+        return when {
+            pathToResource.extension == "xml" -> {
+                pathToResource.bufferedReader().use {
+                    val parser = ResourceParser(this)
+                    parser.setInput(it)
+                    StateListDrawable.createFromXml(resources, parser)
+                }
+            }
+            pathToResource.name.endsWith(".9.png") -> {
+                return NinePatchDrawable(pathToResource)
+            }
+            else -> throw UnsupportedOperationException("Path = $pathToResource")
         }
+    }
+
+    private fun getPathToResource(resName: String): File {
+        return File("../res")
+                .listFiles { s -> s.isDirectory }
+                .flatMap { it.listFiles().toList() }
+                .first { it.nameWithoutExtension.replace(".9", "") == resName }
     }
 
     //        return this.getTheme().obtainStyledAttributes(set, attrs, defStyleAttr, defStyleRes)
