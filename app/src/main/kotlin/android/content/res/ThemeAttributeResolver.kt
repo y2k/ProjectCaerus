@@ -4,6 +4,7 @@ import android.graphics.drawable.Drawable
 import android.graphics.drawable.StateListDrawable
 import android.util.AttributeSet
 import android.util.TypedValue
+import android.util.makeXmlPullAttributes
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
@@ -30,7 +31,7 @@ class ThemeAttributeResolver(private val resources: Resources) {
         println("bgName = $bgName")
 
         File("../res/drawable/$bgName.xml").bufferedReader().use {
-            val parser = KXmlParser()
+            val parser = ResourceParser(this)
             parser.setInput(it)
             return StateListDrawable.createFromXml(resources, parser)
         }
@@ -49,7 +50,7 @@ class ThemeAttributeResolver(private val resources: Resources) {
 //        println("Style = " + style)
         val bgName = style.select("item[name=background]").first().text().split('/')[1]
 //        println("bgName = " + bgName)
-        val bgIndex = public.select("public[type=drawable][name=$bgName]").first().index()
+        val bgIndex = public.select("public[type=drawable][name=$bgName]").first().attrId()
 //        println("bgIndex = " + bgIndex)
 
         val index = getAttrIndex(attrs, "background") ?: return makeEmptyTypedArray(resources)
@@ -62,16 +63,27 @@ class ThemeAttributeResolver(private val resources: Resources) {
         return result;
     }
 
-
     private fun getAttrIndex(attrs: IntArray, name: String): Int? {
-        val index = public.select("public[type='attr'][name=$name]").first().index()
+        val index = getResource("attr", name)
         return attrs.indexOf(index).let { if (it >= 0) it else null }
+    }
+
+    fun getAttributeIndex(name: String): Int {
+        return getResource("attr", name)
+    }
+
+    fun getDrawableIndex(name: String): Int {
+        return getResource("drawable", name)
+    }
+
+    private fun getResource(type: String, name: String): Int {
+        return public.select("public[type='$type'][name=$name]").first().attrId()
     }
 }
 
 fun makeEmptyTypedArray(resources: Resources) = TypedArray(resources, IntArray(100), intArrayOf(0), 0)
 
-fun Element.index(): Int {
+fun Element.attrId(): Int {
     return attr("id").let { Integer.parseInt(it.substring(2), 16) }
 }
 
