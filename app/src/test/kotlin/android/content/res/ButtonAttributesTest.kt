@@ -47,27 +47,28 @@ class ButtonAttributesTest {
             when_(resources.compatibilityInfo).then {
                 CompatibilityInfo(ApplicationInfo())
             }
+            val resolver = ThemeAttributeResolver(resources)
             when_(resources.loadDrawable(any(), anyInt())).then {
-                ThemeAttributeResolver(resources).loadDrawable(
-                    it.arguments[0] as TypedValue,
-                    it.arguments[1] as Int)
+                resolver.loadDrawable(it.arguments[1] as Int)
             }
-            when_(resources.obtainAttributes(any(), any()))
-                .then {
-                    ThemeAttributeResolver(resources).obtainStyledAttributes(
+            when_(resources.obtainAttributes(any(), any())).then {
+                resolver.obtainStyledAttributes(
                         it.arguments[0] as AttributeSet?,
                         it.arguments[1] as IntArray, 0, 0)
-                }
+            }
+            when_(resources.getDrawable(anyInt())).then {
+                resolver.loadDrawable(it.arguments[0] as Int)
+            }
             resources
         }
 
         val themeAttributeResolver = ThemeAttributeResolver(context.resources)
         when_(context.obtainStyledAttributes(any(), any(), anyInt(), anyInt())).then {
             themeAttributeResolver.obtainStyledAttributes(
-                it.arguments[0] as AttributeSet?,
-                it.arguments[1] as IntArray,
-                it.arguments[2] as Int,
-                it.arguments[3] as Int
+                    it.arguments[0] as AttributeSet?,
+                    it.arguments[1] as IntArray,
+                    it.arguments[2] as Int,
+                    it.arguments[3] as Int
             )
         }
 
@@ -86,8 +87,8 @@ class ButtonAttributesTest {
         button.text = "Hello World"
 
         button.measure(
-            View.MeasureSpec.makeMeasureSpec(virtScreen.first, View.MeasureSpec.EXACTLY),
-            View.MeasureSpec.makeMeasureSpec(virtScreen.second, View.MeasureSpec.EXACTLY))
+                View.MeasureSpec.makeMeasureSpec(virtScreen.first, View.MeasureSpec.EXACTLY),
+                View.MeasureSpec.makeMeasureSpec(virtScreen.second, View.MeasureSpec.EXACTLY))
         button.layout(0, 0, virtScreen.first, virtScreen.second)
 
         button.draw(canvas)
