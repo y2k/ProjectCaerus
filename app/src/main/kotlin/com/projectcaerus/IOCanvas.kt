@@ -3,6 +3,7 @@ package com.projectcaerus
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Paint
+import android.graphics.Rect
 import java.awt.Color
 import java.awt.Font
 import java.awt.Graphics2D
@@ -75,6 +76,15 @@ class IOCanvas(val virtWidth: Int, val virtHeight: Int) : Canvas() {
     override fun restoreToCount(index: Int) {
         while (states.size > index) states.pop()
         canvas.transform = states.pop()
+    }
+
+    override fun drawBitmap(bitmap: Bitmap, src: Rect?, dst: Rect?, paint: Paint?) {
+        val s = src ?: Rect(0, 0, bitmap.image.getWidth(null), bitmap.image.getHeight(null))
+        val d = dst ?: Rect(0, 0, virtWidth, virtHeight)
+        canvas.drawImage(bitmap.image,
+                d.left, d.top, d.width(), d.height(),
+                s.left, s.top, s.width(), s.height(),
+                null)
     }
 
     override fun setBitmap(bitmap: Bitmap?) {

@@ -12,18 +12,12 @@ import javax.imageio.ImageIO
  */
 class NinePatchDrawable(path: File) : Drawable() {
 
-    private val image = ImageIO.read(path)
+    private val image = Bitmap(ImageIO.read(path))
 
     override fun draw(canvas: Canvas) {
-        canvas.drawBitmap(getAndroidBitmap(), null, bounds, null)
+        canvas.drawBitmap(image, null, bounds, null)
     }
-
-    private fun getAndroidBitmap(): Bitmap {
-        throw UnsupportedOperationException("not implemented")
-    }
-
-    private fun getBitmap() = null
-
+    
     override fun setAlpha(alpha: Int) {
         // Ignore
     }

@@ -9,6 +9,7 @@ import android.util.DisplayMetrics
 import android.util.TypedValue
 import android.view.View
 import android.widget.Button
+import com.projectcaerus.IOCanvas
 import com.projectcaerus.setFinalField
 import com.projectcaerus.when_
 import org.junit.Before
@@ -72,13 +73,14 @@ class ButtonAttributesTest {
             )
         }
 
-        canvas = mock(Canvas::class.java, Answer {
-            println("called = " + it)
-
-            if (it.method.name == "save") 1
-            else null
-        })
-        when_(canvas.save()).then { 1 }
+//        canvas = mock(Canvas::class.java, Answer {
+//            println("called = " + it)
+//
+//            if (it.method.name == "save") 1
+//            else null
+//        })
+//        when_(canvas.save()).then { 1 }
+        canvas = IOCanvas(virtScreen.first, virtScreen.second)
     }
 
     @Test
@@ -92,6 +94,6 @@ class ButtonAttributesTest {
         button.layout(0, 0, virtScreen.first, virtScreen.second)
 
         button.draw(canvas)
-//        canvas.setBitmap(null)
+        canvas.setBitmap(null)
     }
 }
