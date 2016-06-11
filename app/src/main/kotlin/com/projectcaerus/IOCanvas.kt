@@ -82,8 +82,8 @@ class IOCanvas(val virtWidth: Int, val virtHeight: Int) : Canvas() {
         val s = src ?: Rect(0, 0, bitmap.image.getWidth(null), bitmap.image.getHeight(null))
         val d = dst ?: Rect(0, 0, virtWidth, virtHeight)
         canvas.drawImage(bitmap.image,
-                d.left, d.top, d.width(), d.height(),
-                s.left, s.top, s.width(), s.height(),
+                d.left, d.top, d.right, d.bottom,
+                s.left, s.top, s.right, s.bottom,
                 null)
     }
 

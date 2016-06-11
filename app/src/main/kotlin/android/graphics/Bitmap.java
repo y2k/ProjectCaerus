@@ -53,7 +53,7 @@ public final class Bitmap implements Parcelable {
     private static volatile Matrix sScaleMatrix;
 
     private static volatile int sDefaultDensity = -1;
-    private BufferedImage image;
+    private BufferedImage mImage;
 
     /**
      * For backwards compatibility, allows the app layer to change the default
@@ -73,11 +73,13 @@ public final class Bitmap implements Parcelable {
     }
 
     public Bitmap(BufferedImage image) {
-        this.image = image;
+        mImage = image;
+        mWidth = image.getWidth();
+        mHeight = image.getHeight();
     }
 
     public Image getImage() {
-        return image;
+        return mImage;
     }
 
     /**
@@ -580,7 +582,7 @@ public final class Bitmap implements Parcelable {
      * and/or may have lost per-pixel alpha (e.g. JPEG only supports opaque
      * pixels).
      *
-     * @param format   The format of the compressed image
+     * @param format   The format of the compressed mImage
      * @param quality  Hint to the compressor, 0-100. 0 meaning compress for
      *                 small size, 100 meaning compress for max quality. Some
      *                 formats, like PNG which is lossless, will ignore the
