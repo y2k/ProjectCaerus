@@ -4,7 +4,7 @@ import android.content.Context
 import android.emoji.EmojiFactory
 import android.graphics.Canvas
 import android.view.View
-import android.widget.Button
+import android.widget.EditText
 import com.projectcaerus.IOCanvas
 import org.junit.Before
 import org.junit.Test
@@ -13,11 +13,11 @@ import org.powermock.core.classloader.annotations.PrepareForTest
 import org.powermock.modules.junit4.PowerMockRunner
 
 /**
- * Created by y2k on 6/5/16.
+ * Created by y2k on 11/06/16.
  */
 @RunWith(PowerMockRunner::class)
 @PrepareForTest(Resources.Theme::class, Context::class, EmojiFactory::class)
-class ButtonAttributesTest {
+class EditTextAttributeTest {
 
     val virtScreen = 320 to 480
 
@@ -32,15 +32,15 @@ class ButtonAttributesTest {
 
     @Test
     fun test() {
-        val button = Button(context)
-        button.text = "Hello World"
+        val editText = EditText(context)
+        editText.hint = "Hint Hello World"
 
-        button.measure(
+        editText.measure(
                 View.MeasureSpec.makeMeasureSpec(virtScreen.first, View.MeasureSpec.EXACTLY),
                 View.MeasureSpec.makeMeasureSpec(virtScreen.second, View.MeasureSpec.EXACTLY))
-        button.layout(0, 0, virtScreen.first, virtScreen.second)
+        editText.layout(0, 0, virtScreen.first, virtScreen.second)
 
-        button.draw(canvas)
+        editText.draw(canvas)
         canvas.setBitmap(null)
     }
 }

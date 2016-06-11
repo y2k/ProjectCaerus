@@ -30,8 +30,8 @@ class NinePatchDrawable(path: File) : Drawable() {
 
         srcRect = listOf(
                 Rect(0, 0, hResize.first, vResize.first),
-                Rect(hResize.first, 0, bitmap.width - vResize.second, vResize.first),
-                Rect(bitmap.width - vResize.second, 0, bitmap.width, vResize.first),
+                Rect(hResize.first, 0, bitmap.width - hResize.second, vResize.first),
+                Rect(bitmap.width - hResize.second, 0, bitmap.width, vResize.first),
 
                 Rect(0, vResize.first, hResize.first, bitmap.height - vResize.second),
                 Rect(hResize.first, vResize.first, bitmap.width - hResize.second, bitmap.height - vResize.second),
@@ -57,7 +57,7 @@ class NinePatchDrawable(path: File) : Drawable() {
     override fun draw(canvas: Canvas) {
         listOf(
                 Rect(bounds.left, bounds.top, bounds.left + hResize.first, bounds.top + vResize.first),
-                Rect(bounds.left + hResize.first, bounds.top, bounds.right - vResize.second, bounds.top + vResize.first),
+                Rect(bounds.left + hResize.first, bounds.top, bounds.right - hResize.second, bounds.top + vResize.first),
                 Rect(bounds.right - hResize.second, bounds.top, bounds.right, bounds.top + vResize.first),
 
                 Rect(bounds.left, bounds.top + vResize.first, hResize.first, bounds.bottom - vResize.second),

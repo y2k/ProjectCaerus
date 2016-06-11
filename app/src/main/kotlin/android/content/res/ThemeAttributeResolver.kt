@@ -58,15 +58,11 @@ class ThemeAttributeResolver(private val resources: Resources) {
 
         val styleAttrName = public.select("public[id=${defStyleAttr.toHex()}]").first()
         if (styleAttrName.attr("type") != "attr") throw IllegalStateException()
-//        println("Attr name = " + styleAttrName.attr("name"))
         val styleName = styles.select("style[name=Theme] > item[name=${styleAttrName.attr("name")}]").first()
-//        println("Style name = " + styleName.text())
         val style = styles.select("style[name=${styleName.text().split('/')[1]}]").first()
-//        println("Style = " + style)
+
         val bgName = style.select("item[name=background]").first().text().split('/')[1]
-//        println("bgName = " + bgName)
         val bgIndex = public.select("public[type=drawable][name=$bgName]").first().attrId()
-//        println("bgIndex = " + bgIndex)
 
         val index = getAttrIndex(attrs, "background") ?: return makeEmptyTypedArray(resources)
 
