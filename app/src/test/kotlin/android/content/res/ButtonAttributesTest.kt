@@ -5,7 +5,7 @@ import android.emoji.EmojiFactory
 import android.graphics.Canvas
 import android.view.View
 import android.widget.Button
-import com.projectcaerus.IOCanvas
+import com.projectcaerus.AwtCanvas
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -27,7 +27,7 @@ class ButtonAttributesTest {
     @Before
     fun setUp() {
         context = ContextFactory().make()
-        canvas = IOCanvas(virtScreen.first, virtScreen.second)
+        canvas = AwtCanvas(virtScreen.first, virtScreen.second)
     }
 
     @Test

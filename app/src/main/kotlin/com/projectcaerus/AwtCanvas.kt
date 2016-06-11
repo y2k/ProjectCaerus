@@ -16,7 +16,7 @@ import javax.imageio.ImageIO
 /**
  * Created by y2k on 6/5/16.
  */
-class IOCanvas(val virtWidth: Int, val virtHeight: Int) : Canvas() {
+class AwtCanvas(val virtWidth: Int, val virtHeight: Int) : Canvas() {
 
     private val image: BufferedImage
     private val canvas: Graphics2D

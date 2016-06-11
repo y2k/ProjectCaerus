@@ -62,7 +62,7 @@ class ButtonTest {
 //            else null
 //        })
 //        when_(canvas.save()).then { 1 }
-        canvas = IOCanvas(virtScreen.first, virtScreen.second)
+        canvas = AwtCanvas(virtScreen.first, virtScreen.second)
     }
 
     @Test
