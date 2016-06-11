@@ -7,7 +7,7 @@ import org.kxml2.io.KXmlParser
 /**
  * Created by y2k on 10/06/16.
  */
-class ResourceParser(private val resolver: ThemeAttributeResolver) : KXmlParser(), AttributeSet {
+class ResourceParser(private val resolver: ThemeAttributeResolver) : KXmlParser(), XmlResourceParser, AttributeSet {
 
     private val attrs = makeXmlPullAttributes(this)
 

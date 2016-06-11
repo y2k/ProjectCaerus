@@ -25,6 +25,15 @@ class ThemeAttributeResolver(private val resources: Resources) {
         styles = Jsoup.parse(File("../res/values/styles.xml").readText(), "", Parser.xmlParser())
     }
 
+    fun getLayout(id: Int): XmlResourceParser {
+        val layoutName = public.select("public[type=layout][id=${id.toHex()}]").first().attr("name")
+        val pathToResource = File(File("../res/layout"), "$layoutName.xml")
+
+        val parser = ResourceParser(this)
+        parser.setInput(pathToResource.bufferedReader())
+        return parser
+    }
+
     fun loadDrawable(id: Int): Drawable {
         val bgName = public.select("public[type=drawable][id=${id.toHex()}]").first().attr("name")
         println("bgName = $bgName")

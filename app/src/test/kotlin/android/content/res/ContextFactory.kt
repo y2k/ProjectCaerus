@@ -30,6 +30,7 @@ class ContextFactory {
             when_(resources.compatibilityInfo).then {
                 CompatibilityInfo(ApplicationInfo())
             }
+
             val resolver = ThemeAttributeResolver(resources)
             when_(resources.loadDrawable(any(), anyInt())).then {
                 resolver.loadDrawable(it.arguments[1] as Int)
@@ -42,6 +43,11 @@ class ContextFactory {
             when_(resources.getDrawable(anyInt())).then {
                 resolver.loadDrawable(it.arguments[0] as Int)
             }
+
+            when_(resources.getLayout(anyInt())).then {
+                resolver.getLayout(it.arguments[0] as Int)
+            }
+
             resources
         }
 
