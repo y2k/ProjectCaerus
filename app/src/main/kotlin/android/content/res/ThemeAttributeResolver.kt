@@ -67,11 +67,11 @@ class ThemeAttributeResolver(private val resources: Resources) {
         if (set != null && set.getAttributeValue(null, "android:layout_width") != null) {
             val wIndex = getAttrIndex(attrs, "layout_width") ?: return makeEmptyTypedArray(resources)
             val hIndex = getAttrIndex(attrs, "layout_height") ?: return makeEmptyTypedArray(resources)
-            val data = IntArray((Math.max(wIndex, hIndex) + 1) * 6)
+            val data = IntArray(attrs.size * 6)
             loadDimension(set, data, "layout_width", wIndex)
             loadDimension(set, data, "layout_height", hIndex)
 
-            return TypedArray(resources, data, intArrayOf(1, wIndex, hIndex), 2);
+            return TypedArray(resources, data, intArrayOf(2, wIndex, hIndex), attrs.size);
         }
 
         if (defStyleAttr == 0) return makeEmptyTypedArray(resources)
@@ -99,8 +99,8 @@ class ThemeAttributeResolver(private val resources: Resources) {
         val size = parserStringToDimension(sizeText)
 
         if (size >= 0) {
-            target[6 * 0] = TypedValue.TYPE_DIMENSION
-            target[6 * 0 + 1] = (26 shl 8) + (TypedValue.COMPLEX_UNIT_DIP) + (0 shl 4)
+            target[6 * index] = TypedValue.TYPE_DIMENSION
+            target[6 * index + 1] = (26 shl 8) + (TypedValue.COMPLEX_UNIT_DIP) + (0 shl 4)
         } else {
             target[6 * index] = TypedValue.TYPE_FIRST_INT
             target[6 * index + 1] = size
