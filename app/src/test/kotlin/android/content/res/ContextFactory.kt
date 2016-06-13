@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.pm.ApplicationInfo
 import android.emoji.EmojiFactory
 import android.test.mock.MockContext
+import android.test.mock.MockResources
 import android.util.AttributeSet
 import android.util.DisplayMetrics
 import android.util.TypedValue
@@ -16,6 +17,8 @@ import org.powermock.api.mockito.PowerMockito
  * Created by y2k on 11/06/16.
  */
 class ContextFactory {
+
+    private lateinit var resolver: AppThemeAttributeResolver
 
     fun make(): Context {
         PowerMockito.mockStatic(EmojiFactory::class.java)
@@ -122,6 +125,44 @@ class ContextFactory {
                     )
                 }
                 return theme
+            }
+
+            override fun getClassLoader(): ClassLoader? {
+                return javaClass.classLoader
+            }
+        }
+        return context
+    }
+
+    fun makeNoPowerMock(loader: ClassLoader): Context {
+        val resources = object : MockResources() {
+
+            override fun getLayout(id: Int): XmlResourceParser? {
+                return resolver.getLayout(id)
+            }
+
+            override fun getDisplayMetrics(): DisplayMetrics? {
+                return DisplayMetrics().apply {
+                    setToDefaults()
+                    widthPixels = 320
+                    heightPixels = 480
+                }
+            }
+        }
+        resolver = AppThemeAttributeResolver(resources, loader)
+
+        val context = object : MockContext() {
+
+            override fun obtainStyledAttributes(set: AttributeSet?, attrs: IntArray, defStyleAttr: Int, defStyleRes: Int): TypedArray? {
+                return resolver.obtainStyledAttributes(set, attrs, defStyleAttr, defStyleRes)
+            }
+
+            override fun obtainStyledAttributes(set: AttributeSet?, attrs: IntArray): TypedArray? {
+                return resolver.obtainStyledAttributes(set, attrs, 0, 0)
+            }
+
+            override fun getResources(): Resources {
+                return resources
             }
 
             override fun getClassLoader(): ClassLoader? {

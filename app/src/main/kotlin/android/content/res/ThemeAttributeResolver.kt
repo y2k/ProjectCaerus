@@ -16,7 +16,7 @@ import java.io.File
  * Created by y2k on 6/5/16.
  */
 
-class ThemeAttributeResolver(private val resources: Resources) {
+open class ThemeAttributeResolver(private val resources: Resources) {
 
     private val public: Document
     private val styles: Document
@@ -35,12 +35,15 @@ class ThemeAttributeResolver(private val resources: Resources) {
     }
 
     private fun getXmlResourceById(id: Int, type: String): ResourceParser {
-        val resName = public.select("public[type=$type][id=${id.toHex()}]").first().attr("name")
-        val pathToResource = File(File("../res/$type"), "$resName.xml")
-
+        val pathToResource = getPathToResource(id, type)
         val parser = ResourceParser(this)
         parser.setInput(pathToResource.bufferedReader())
         return parser
+    }
+
+    protected open fun getPathToResource(id: Int, type: String): File {
+        val resName = public.select("public[type=$type][id=${id.toHex()}]").first().attr("name")
+        return File(File("../res/$type"), "$resName.xml")
     }
 
     fun loadDrawable(id: Int): Drawable {
