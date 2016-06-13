@@ -75,8 +75,12 @@ class ContextFactory {
                 setFinalField(resources, Resources::class.java.getDeclaredField("mTmpValue"), TypedValue())
 
                 when_(resources.displayMetrics).then {
-                    DisplayMetrics()
+                    DisplayMetrics().apply { density = 1f }
                 }
+                setFinalField(resources,
+                        Resources::class.java.getDeclaredField("mMetrics"),
+                        DisplayMetrics().apply { density = 1f })
+
                 when_(resources.compatibilityInfo).then {
                     CompatibilityInfo(ApplicationInfo())
                 }
