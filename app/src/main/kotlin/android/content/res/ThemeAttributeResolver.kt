@@ -1,7 +1,6 @@
 package android.content.res
 
 import android.graphics.drawable.Drawable
-import android.graphics.drawable.StateListDrawable
 import android.util.AttributeSet
 import android.util.TypedValue
 import android.view.ViewGroup
@@ -27,9 +26,17 @@ class ThemeAttributeResolver(private val resources: Resources) {
         styles = Jsoup.parse(File("../res/values/styles.xml").readText(), "", Parser.xmlParser())
     }
 
+    fun getAnimation(id: Int): XmlResourceParser {
+        return getXmlResourceById(id, "anim")
+    }
+
     fun getLayout(id: Int): XmlResourceParser {
-        val layoutName = public.select("public[type=layout][id=${id.toHex()}]").first().attr("name")
-        val pathToResource = File(File("../res/layout"), "$layoutName.xml")
+        return getXmlResourceById(id, "layout")
+    }
+
+    private fun getXmlResourceById(id: Int, type: String): ResourceParser {
+        val resName = public.select("public[type=$type][id=${id.toHex()}]").first().attr("name")
+        val pathToResource = File(File("../res/$type"), "$resName.xml")
 
         val parser = ResourceParser(this)
         parser.setInput(pathToResource.bufferedReader())

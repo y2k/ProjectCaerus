@@ -102,6 +102,10 @@ class ContextFactory {
                     resolver.getLayout(it.arguments[0] as Int)
                 }
 
+                when_(resources.getAnimation(anyInt())).then {
+                    resolver.getAnimation(it.arguments[0] as Int)
+                }
+
                 return resources
             }
 
