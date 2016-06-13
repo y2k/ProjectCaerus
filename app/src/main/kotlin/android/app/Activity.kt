@@ -1,5 +1,6 @@
 package android.app
 
+import android.graphics.Canvas
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -25,12 +26,15 @@ open class Activity {
     }
 
     fun dump(screen: Size) {
+        dumpTo(screen, AwtCanvas(screen))
+    }
+
+    fun dumpTo(screen: Size, canvas: Canvas) {
         view.measure(
                 View.MeasureSpec.makeMeasureSpec(screen.width, View.MeasureSpec.EXACTLY),
                 View.MeasureSpec.makeMeasureSpec(screen.height, View.MeasureSpec.EXACTLY))
         view.layout(0, 0, screen.width, screen.height)
 
-        val canvas = AwtCanvas(screen)
         view.draw(canvas)
         canvas.setBitmap(null)
     }
