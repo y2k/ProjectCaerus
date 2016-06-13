@@ -31,7 +31,7 @@ import org.powermock.modules.junit4.PowerMockRunner
 @PrepareForTest(Resources.Theme::class, Context::class, EmojiFactory::class)
 class ButtonTest {
 
-    val virtScreen = 320 to 480
+    val screen = Size(320, 480)
 
     lateinit var context: Context
     lateinit var canvas: Canvas
@@ -55,14 +55,7 @@ class ButtonTest {
             mock(TypedArray::class.java)
         }
 
-//        canvas = mock(Canvas::class.java, Answer {
-//            println("called = " + it)
-//
-//            if (it.method.name == "save") 1
-//            else null
-//        })
-//        when_(canvas.save()).then { 1 }
-        canvas = AwtCanvas(virtScreen.first, virtScreen.second)
+        canvas = AwtCanvas(screen)
     }
 
     @Test
@@ -71,9 +64,9 @@ class ButtonTest {
         button.text = "Hello World"
 
         button.measure(
-            View.MeasureSpec.makeMeasureSpec(virtScreen.first, View.MeasureSpec.EXACTLY),
-            View.MeasureSpec.makeMeasureSpec(virtScreen.second, View.MeasureSpec.EXACTLY))
-        button.layout(0, 0, virtScreen.first, virtScreen.second)
+                View.MeasureSpec.makeMeasureSpec(screen.width, View.MeasureSpec.EXACTLY),
+                View.MeasureSpec.makeMeasureSpec(screen.height, View.MeasureSpec.EXACTLY))
+        button.layout(0, 0, screen.width, screen.height)
 
         button.draw(canvas)
         canvas.setBitmap(null)
@@ -85,21 +78,21 @@ class ButtonTest {
             orientation = LinearLayout.VERTICAL
 
             addView(
-                Button(context).apply {
-                    text = "Button 1"
-                    layoutParams = LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0, 1f)
-                })
+                    Button(context).apply {
+                        text = "Button 1"
+                        layoutParams = LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0, 1f)
+                    })
             addView(
-                EditText(context).apply {
-                    hint = "Hint for edittext"
-                    layoutParams = LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0, 1f)
-                })
+                    EditText(context).apply {
+                        hint = "Hint for edittext"
+                        layoutParams = LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0, 1f)
+                    })
         }
 
         linearLayout.measure(
-            View.MeasureSpec.makeMeasureSpec(virtScreen.first, View.MeasureSpec.EXACTLY),
-            View.MeasureSpec.makeMeasureSpec(virtScreen.second, View.MeasureSpec.EXACTLY))
-        linearLayout.layout(0, 0, virtScreen.first, virtScreen.second)
+                View.MeasureSpec.makeMeasureSpec(screen.width, View.MeasureSpec.EXACTLY),
+                View.MeasureSpec.makeMeasureSpec(screen.height, View.MeasureSpec.EXACTLY))
+        linearLayout.layout(0, 0, screen.width, screen.height)
         linearLayout.draw(canvas)
         canvas.setBitmap(null)
     }

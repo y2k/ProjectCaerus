@@ -3,6 +3,7 @@ package com.projectcaerus.samples
 import android.app.Activity
 import android.content.res.ContextFactory
 import com.android.internal.policy.impl.PhoneLayoutInflater
+import com.projectcaerus.Size
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -29,6 +30,6 @@ class SampleTest {
         mainActivity.inflater = PhoneLayoutInflater(context)
         mainActivity.onCreate(null)
 
-        mainActivity.dump(320, 480)
+        mainActivity.dump(Size(320, 480))
     }
 }

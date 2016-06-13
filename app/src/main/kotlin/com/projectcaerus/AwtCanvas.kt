@@ -16,15 +16,21 @@ import javax.imageio.ImageIO
 /**
  * Created by y2k on 6/5/16.
  */
-class AwtCanvas(val virtWidth: Int, val virtHeight: Int) : Canvas() {
+class AwtCanvas(val size: Size) : Canvas() {
 
     private val image: BufferedImage
     private val canvas: Graphics2D
     private val states = Stack<AffineTransform>()
 
     init {
-        image = BufferedImage(virtWidth, virtHeight, BufferedImage.TYPE_4BYTE_ABGR)
+        image = BufferedImage(size.width, size.height, BufferedImage.TYPE_4BYTE_ABGR)
         canvas = image.createGraphics()
+    }
+
+    override fun getClipBounds(bounds: Rect): Boolean {
+        bounds.right = size.width
+        bounds.bottom = size.height
+        return true
     }
 
     override fun save(): Int {
@@ -80,7 +86,7 @@ class AwtCanvas(val virtWidth: Int, val virtHeight: Int) : Canvas() {
 
     override fun drawBitmap(bitmap: Bitmap, src: Rect?, dst: Rect?, paint: Paint?) {
         val s = src ?: Rect(0, 0, bitmap.image.getWidth(null), bitmap.image.getHeight(null))
-        val d = dst ?: Rect(0, 0, virtWidth, virtHeight)
+        val d = dst ?: Rect(0, 0, size.width, size.height)
         canvas.drawImage(bitmap.image,
                 d.left, d.top, d.right, d.bottom,
                 s.left, s.top, s.right, s.bottom,

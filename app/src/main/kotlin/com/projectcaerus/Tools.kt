@@ -19,3 +19,5 @@ fun Any.invoke(methodName: String, argsTypes: List<KClass<*>>, vararg args: Any?
     method.isAccessible = true
     method.invoke(this, *args)
 }
+
+data class Size(val width: Int, val height: Int)

@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import com.projectcaerus.AwtCanvas
+import com.projectcaerus.Size
 
 /**
  * Created by y2k on 13/06/16.
@@ -23,14 +24,13 @@ open class Activity {
         view = inflater.inflate(viewId, null)
     }
 
-    fun dump(width: Int, height: Int) {
-        val screen = width to height
+    fun dump(screen: Size) {
         view.measure(
-                View.MeasureSpec.makeMeasureSpec(screen.first, View.MeasureSpec.EXACTLY),
-                View.MeasureSpec.makeMeasureSpec(screen.second, View.MeasureSpec.EXACTLY))
-        view.layout(0, 0, screen.first, screen.second)
+                View.MeasureSpec.makeMeasureSpec(screen.width, View.MeasureSpec.EXACTLY),
+                View.MeasureSpec.makeMeasureSpec(screen.height, View.MeasureSpec.EXACTLY))
+        view.layout(0, 0, screen.width, screen.height)
 
-        val canvas = AwtCanvas(width, height)
+        val canvas = AwtCanvas(screen)
         view.draw(canvas)
         canvas.setBitmap(null)
     }
