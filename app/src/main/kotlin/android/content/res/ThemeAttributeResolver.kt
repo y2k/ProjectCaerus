@@ -77,8 +77,8 @@ class ThemeAttributeResolver(private val resources: Resources) {
 
         val styleAttrName = public.select("public[id=${defStyleAttr.toHex()}]").first()
         if (styleAttrName.attr("type") != "attr") throw IllegalStateException()
-        val styleName = styles.select("style[name=Theme] > item[name=${styleAttrName.attr("name")}]").first()
-        val style = styles.select("style[name=${styleName.text().split('/')[1]}]").first()
+        val styleName = getThemeAttribute(styleAttrName.attr("name"))
+        val style = styles.select("style[name=${styleName.split('/')[1]}]").first()
 
         val bgName = style.select("item[name=background]").first().text().split('/')[1]
         val bgIndex = public.select("public[type=drawable][name=$bgName]").first().attrId()
@@ -95,15 +95,7 @@ class ThemeAttributeResolver(private val resources: Resources) {
 
     fun loadDimension(set: AttributeSet, target: IntArray, dimName: String, index: Int) {
         val sizeText = set.getAttributeValue(null, "android:$dimName")
-        val dipRegex = "(\\d+)sp|dip|dp".toRegex()
-        val themeAttrRegex = "\\?(.+)".toRegex()
-        val size = when {
-            sizeText in listOf("fill_parent", "match_parent") -> ViewGroup.LayoutParams.MATCH_PARENT
-            sizeText == "wrap_content" -> ViewGroup.LayoutParams.WRAP_CONTENT
-            sizeText.matches(dipRegex) -> dipRegex.find(sizeText)!!.groupValues[1].toInt()
-            sizeText.matches(themeAttrRegex) -> getThemeDimensionAttribute(themeAttrRegex.find(sizeText)!!.groupValues[1])
-            else -> throw IllegalStateException(sizeText)
-        }
+        val size = parserStringToDimension(sizeText)
 
         if (size >= 0) {
             target[6 * 0] = TypedValue.TYPE_DIMENSION
@@ -114,8 +106,25 @@ class ThemeAttributeResolver(private val resources: Resources) {
         }
     }
 
+    private fun parserStringToDimension(sizeText: String): Int {
+        val dipRegex = "(\\d+)(sp|dip|dp)".toRegex()
+        val themeAttrRegex = "\\?(.+)".toRegex()
+        val size = when {
+            sizeText in listOf("fill_parent", "match_parent") -> ViewGroup.LayoutParams.MATCH_PARENT
+            sizeText == "wrap_content" -> ViewGroup.LayoutParams.WRAP_CONTENT
+            sizeText.matches(dipRegex) -> dipRegex.find(sizeText)!!.groupValues[1].toInt()
+            sizeText.matches(themeAttrRegex) -> getThemeDimensionAttribute(themeAttrRegex.find(sizeText)!!.groupValues[1])
+            else -> throw IllegalStateException(sizeText)
+        }
+        return size
+    }
+
     private fun getThemeDimensionAttribute(attributeName: String): Int {
-        TODO("attributeName = $attributeName")
+        return parserStringToDimension(getThemeAttribute(attributeName))
+    }
+
+    private fun getThemeAttribute(attributeName: String): String {
+        return styles.select("style[name=Theme] > item[name=$attributeName]").first().text()
     }
 
     private fun getAttrIndex(attrs: IntArray, name: String): Int? {
