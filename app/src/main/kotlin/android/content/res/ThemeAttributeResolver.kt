@@ -6,6 +6,7 @@ import android.util.AttributeSet
 import android.util.TypedValue
 import android.view.ViewGroup
 import com.projectcaerus.NinePatchDrawable
+import com.projectcaerus.createStateListDrawable
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
@@ -45,7 +46,7 @@ class ThemeAttributeResolver(private val resources: Resources) {
                 pathToResource.bufferedReader().use {
                     val parser = ResourceParser(this)
                     parser.setInput(it)
-                    StateListDrawable.createFromXml(resources, parser)
+                    createStateListDrawable(resources, parser)
                 }
             }
             pathToResource.name.endsWith(".9.png") -> {
