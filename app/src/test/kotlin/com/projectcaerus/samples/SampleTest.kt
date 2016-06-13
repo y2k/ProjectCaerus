@@ -28,5 +28,7 @@ class SampleTest {
         val mainActivity = mainClass.newInstance() as Activity
         mainActivity.inflater = PhoneLayoutInflater(context)
         mainActivity.onCreate(null)
+
+        mainActivity.dump(320, 480)
     }
 }
