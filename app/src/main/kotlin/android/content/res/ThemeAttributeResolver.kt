@@ -108,12 +108,12 @@ class ThemeAttributeResolver(private val resources: Resources) {
     }
 
     private fun parserStringToDimension(sizeText: String): Int {
-        val dipRegex = "(\\d+)(sp|dip|dp)".toRegex()
+        val dipRegex = "([\\d\\.]+)(sp|dip|dp)".toRegex()
         val themeAttrRegex = "\\?(.+)".toRegex()
         val size = when {
             sizeText in listOf("fill_parent", "match_parent") -> ViewGroup.LayoutParams.MATCH_PARENT
             sizeText == "wrap_content" -> ViewGroup.LayoutParams.WRAP_CONTENT
-            sizeText.matches(dipRegex) -> dipRegex.find(sizeText)!!.groupValues[1].toInt()
+            sizeText.matches(dipRegex) -> dipRegex.find(sizeText)!!.groupValues[1].toFloat().toInt()
             sizeText.matches(themeAttrRegex) -> getThemeDimensionAttribute(themeAttrRegex.find(sizeText)!!.groupValues[1])
             else -> throw IllegalStateException(sizeText)
         }
