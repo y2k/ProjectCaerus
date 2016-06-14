@@ -3,6 +3,7 @@ package android.content.res
 import android.content.Context
 import android.content.pm.ApplicationInfo
 import android.emoji.EmojiFactory
+import android.graphics.drawable.Drawable
 import android.test.mock.MockContext
 import android.test.mock.MockResources
 import android.util.AttributeSet
@@ -41,8 +42,8 @@ class ContextFactory {
             }
             when_(resources.obtainAttributes(any(), any())).then {
                 resolver.obtainStyledAttributes(
-                        it.arguments[0] as AttributeSet?,
-                        it.arguments[1] as IntArray, 0, 0)
+                    it.arguments[0] as AttributeSet?,
+                    it.arguments[1] as IntArray, 0, 0)
             }
             when_(resources.getDrawable(anyInt())).then {
                 resolver.loadDrawable(it.arguments[0] as Int)
@@ -58,10 +59,10 @@ class ContextFactory {
         val themeAttributeResolver = ThemeAttributeResolver(context.resources)
         when_(context.obtainStyledAttributes(any(), any(), anyInt(), anyInt())).then {
             themeAttributeResolver.obtainStyledAttributes(
-                    it.arguments[0] as AttributeSet?,
-                    it.arguments[1] as IntArray,
-                    it.arguments[2] as Int,
-                    it.arguments[3] as Int
+                it.arguments[0] as AttributeSet?,
+                it.arguments[1] as IntArray,
+                it.arguments[2] as Int,
+                it.arguments[3] as Int
             )
         }
 
@@ -81,8 +82,8 @@ class ContextFactory {
                     DisplayMetrics().apply { density = 1f }
                 }
                 setFinalField(resources,
-                        Resources::class.java.getDeclaredField("mMetrics"),
-                        DisplayMetrics().apply { density = 1f })
+                    Resources::class.java.getDeclaredField("mMetrics"),
+                    DisplayMetrics().apply { density = 1f })
 
                 when_(resources.compatibilityInfo).then {
                     CompatibilityInfo(ApplicationInfo())
@@ -94,8 +95,8 @@ class ContextFactory {
                 }
                 when_(resources.obtainAttributes(any(), any())).then {
                     resolver.obtainStyledAttributes(
-                            it.arguments[0] as AttributeSet?,
-                            it.arguments[1] as IntArray, 0, 0)
+                        it.arguments[0] as AttributeSet?,
+                        it.arguments[1] as IntArray, 0, 0)
                 }
                 when_(resources.getDrawable(anyInt())).then {
                     resolver.loadDrawable(it.arguments[0] as Int)
@@ -118,10 +119,10 @@ class ContextFactory {
                 val themeAttributeResolver = ThemeAttributeResolver(this.resources)
                 when_(theme.obtainStyledAttributes(any(), any(), anyInt(), anyInt())).then {
                     themeAttributeResolver.obtainStyledAttributes(
-                            it.arguments[0] as AttributeSet?,
-                            it.arguments[1] as IntArray,
-                            it.arguments[2] as Int,
-                            it.arguments[3] as Int
+                        it.arguments[0] as AttributeSet?,
+                        it.arguments[1] as IntArray,
+                        it.arguments[2] as Int,
+                        it.arguments[3] as Int
                     )
                 }
                 return theme
@@ -137,6 +138,18 @@ class ContextFactory {
     fun makeNoPowerMock(loader: ClassLoader): Context {
         val resources = object : MockResources() {
 
+            override fun getAnimation(id: Int): XmlResourceParser? {
+                return resolver.getAnimation(id)
+            }
+
+            override fun getDrawable(id: Int): Drawable? {
+                return resolver.loadDrawable(id)
+            }
+
+            override fun getCompatibilityInfo(): CompatibilityInfo? {
+                return CompatibilityInfo(ApplicationInfo())
+            }
+
             override fun getLayout(id: Int): XmlResourceParser? {
                 return resolver.getLayout(id)
             }
@@ -148,7 +161,12 @@ class ContextFactory {
                     heightPixels = 480
                 }
             }
+
+            override fun loadDrawable(value: TypedValue?, id: Int): Drawable? {
+                return resolver.loadDrawable(id)
+            }
         }
+
         resolver = AppThemeAttributeResolver(resources, loader)
 
         val context = object : MockContext() {
