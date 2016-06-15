@@ -21,10 +21,15 @@ open class ThemeAttributeResolver(private val resources: Resources) {
 
     private val public: Document
     private val styles: Document
+    private val stringPool = HashMap<Int, String>()
 
     init {
         public = Jsoup.parse(File("../res/values/public.xml").readText(), "", Parser.xmlParser())
         styles = Jsoup.parse(File("../res/values/styles.xml").readText(), "", Parser.xmlParser())
+    }
+
+    fun getPooledString(id: Int): CharSequence? {
+        return stringPool[id]
     }
 
     fun getAnimation(id: Int): XmlResourceParser {
@@ -80,16 +85,40 @@ open class ThemeAttributeResolver(private val resources: Resources) {
         val indexes = ArrayList<Int>()
 
         getAttrIndex(attrs, "layout_width")?.let {
-            if (set != null) {
-                loadDimension(set, data, "layout_width", it)
-                indexes.add(it)
-            }
+            if (set == null) return@let
+
+            loadDimension(set, data, "layout_width", it)
+            indexes.add(it)
         }
         getAttrIndex(attrs, "layout_height")?.let {
-            if (set != null) {
-                loadDimension(set, data, "layout_height", it)
-                indexes.add(it)
-            }
+            if (set == null) return@let
+
+            loadDimension(set, data, "layout_height", it)
+            indexes.add(it)
+        }
+
+        getAttrIndex(attrs, "text")?.let {
+            if (set == null) return@let
+
+            val text = set.getAttributeValue(null, "android:text") ?: ""
+            stringPool[text.hashCode()] = text
+
+            data[6 * it] = TypedValue.TYPE_STRING
+            data[6 * it + 1] = text.hashCode()
+
+            indexes.add(it)
+        }
+
+        getAttrIndex(attrs, "hint")?.let {
+            if (set == null) return@let
+
+            val text = set.getAttributeValue(null, "android:hint") ?: ""
+            stringPool[text.hashCode()] = text
+
+            data[6 * it] = TypedValue.TYPE_STRING
+            data[6 * it + 1] = text.hashCode()
+
+            indexes.add(it)
         }
 
         getAttrIndex(attrs, "background")?.let {

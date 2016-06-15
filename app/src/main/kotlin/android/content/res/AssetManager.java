@@ -33,7 +33,7 @@ import java.util.HashMap;
  * files that have been bundled with the application as a simple stream of
  * bytes.
  */
-public final class AssetManager {
+public class AssetManager {
     /* modes used when opening an asset */
 
     /**
@@ -266,7 +266,7 @@ public final class AssetManager {
         }
     }
 
-    /*package*/ final CharSequence getPooledString(int block, int id) {
+    public CharSequence getPooledString(int block, int id) {
         //System.out.println("Get pooled: block=" + block
         //                   + ", id=#" + Integer.toHexString(id)
         //                   + ", blocks=" + mStringBlocks);

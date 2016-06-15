@@ -38,6 +38,10 @@ import java.io.InputStream;
  */
 public class MockResources extends Resources {
 
+    public MockResources(AssetManager am) {
+        super(am, null, null);
+    }
+
     public MockResources() {
         super(new AssetManager(), null, null);
     }

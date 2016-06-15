@@ -33,8 +33,8 @@ class SampleTest {
         mainActivity.inflater = PhoneLayoutInflater(context)
         mainActivity.onCreate(null)
 
-//        mainActivity.dump(Size(320, 480))
-        mainActivity.dumpTo(Size(320, 480), mockCanvas())
+        mainActivity.dump(Size(320, 480))
+//        mainActivity.dumpTo(Size(320, 480), mockCanvas())
     }
 
     private fun mockCanvas(): Canvas {

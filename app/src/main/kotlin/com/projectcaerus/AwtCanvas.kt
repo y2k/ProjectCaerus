@@ -60,7 +60,11 @@ class AwtCanvas(val size: Size) : Canvas() {
         canvas.translate(x.toDouble(), y.toDouble())
     }
 
-    override fun drawText(text: String?, x: Float, y: Float, p3: Paint?) {
+    override fun drawText(text: CharSequence?, start: Int, end: Int, x: Float, y: Float, paint: Paint?) {
+        drawText("" + text?.subSequence(start, end), x, y, paint)
+    }
+
+    override fun drawText(text: String?, x: Float, y: Float, Paint: Paint?) {
         println("drawText: text = '$text', x = $x, y = $y ")
 
         canvas.paint = Color.red;
