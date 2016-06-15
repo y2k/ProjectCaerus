@@ -38,10 +38,9 @@ class SampleTest {
     }
 
     private fun mockCanvas(): Canvas {
-        val canvas = Mockito.mock(Canvas::class.java, Answer {
+        return Mockito.mock(Canvas::class.java, Answer {
             println("called = " + it)
             if (it.method.name == "save") 1 else null
         })
-        return canvas
     }
 }
