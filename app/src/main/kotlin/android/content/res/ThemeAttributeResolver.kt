@@ -4,6 +4,7 @@ import android.graphics.drawable.Drawable
 import android.util.AttributeSet
 import android.util.TypedValue
 import android.view.ViewGroup
+import android.widget.LinearLayout
 import com.projectcaerus.NinePatchDrawable
 import com.projectcaerus.createStateListDrawable
 import org.jsoup.Jsoup
@@ -117,6 +118,21 @@ open class ThemeAttributeResolver(private val resources: Resources) {
 
             data[6 * it] = TypedValue.TYPE_STRING
             data[6 * it + 1] = text.hashCode()
+
+            indexes.add(it)
+        }
+
+        getAttrIndex(attrs, "orientation")?.let {
+            if (set == null) return@let
+
+            val orientation = when (set.getAttributeValue(null, "android:orientation")) {
+                "horizontal" -> LinearLayout.HORIZONTAL
+                "vertical" -> LinearLayout.VERTICAL
+                else -> throw IllegalStateException()
+            }
+
+            data[6 * it] = TypedValue.TYPE_FIRST_INT
+            data[6 * it + 1] = orientation
 
             indexes.add(it)
         }
