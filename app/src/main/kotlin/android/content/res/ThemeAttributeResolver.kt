@@ -11,6 +11,7 @@ import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
 import org.jsoup.parser.Parser
 import java.io.File
+import java.util.*
 
 /**
  * Created by y2k on 6/5/16.
@@ -74,34 +75,46 @@ open class ThemeAttributeResolver(private val resources: Resources) {
     }
 
     fun obtainStyledAttributes(set: AttributeSet?, attrs: IntArray, defStyleAttr: Int, defStyleRes: Int): TypedArray {
-        if (set != null && set.getAttributeValue(null, "android:layout_width") != null) {
-            val wIndex = getAttrIndex(attrs, "layout_width") ?: return makeEmptyTypedArray(resources)
-            val hIndex = getAttrIndex(attrs, "layout_height") ?: return makeEmptyTypedArray(resources)
-            val data = IntArray(attrs.size * 6)
-            loadDimension(set, data, "layout_width", wIndex)
-            loadDimension(set, data, "layout_height", hIndex)
+        val data = IntArray(attrs.size * 6)
+        val style = getStyle(defStyleAttr)
+        val indexes = ArrayList<Int>()
 
-            return TypedArray(resources, data, intArrayOf(2, wIndex, hIndex), attrs.size);
+        getAttrIndex(attrs, "layout_width")?.let {
+            if (set != null) {
+                loadDimension(set, data, "layout_width", it)
+                indexes.add(it)
+            }
+        }
+        getAttrIndex(attrs, "layout_height")?.let {
+            if (set != null) {
+                loadDimension(set, data, "layout_height", it)
+                indexes.add(it)
+            }
         }
 
-        if (defStyleAttr == 0) return makeEmptyTypedArray(resources)
+        getAttrIndex(attrs, "background")?.let {
+            val bgStyle = style.select("item[name=background]").first()
+            if (bgStyle != null) {
+                val bgName = bgStyle.text().split('/')[1]
+                val bgIndex = public.select("public[type=drawable][name=$bgName]").first().attrId()
+
+                data[6 * it] = TypedValue.TYPE_REFERENCE
+                data[6 * it + 3] = bgIndex
+                indexes.add(it)
+            }
+        }
+
+        indexes.add(0, indexes.size)
+        return TypedArray(resources, data, indexes.toIntArray(), attrs.size);
+    }
+
+    private fun getStyle(defStyleAttr: Int): Element {
+        if (defStyleAttr == 0) return Document("")
 
         val styleAttrName = public.select("public[id=${defStyleAttr.toHex()}]").first()
         if (styleAttrName.attr("type") != "attr") throw IllegalStateException()
         val styleName = getThemeAttribute(styleAttrName.attr("name"))
-        val style = styles.select("style[name=${styleName.split('/')[1]}]").first()
-
-        val bgName = style.select("item[name=background]").first().text().split('/')[1]
-        val bgIndex = public.select("public[type=drawable][name=$bgName]").first().attrId()
-
-        val index = getAttrIndex(attrs, "background") ?: return makeEmptyTypedArray(resources)
-
-        val data = IntArray((index + 1) * 6)
-        data[6 * index] = TypedValue.TYPE_REFERENCE
-        data[6 * index + 3] = bgIndex
-
-        val result = TypedArray(resources, data, intArrayOf(1, index), 1)
-        return result;
+        return styles.select("style[name=${styleName.split('/')[1]}]").first()
     }
 
     fun loadDimension(set: AttributeSet, target: IntArray, dimName: String, index: Int) {
