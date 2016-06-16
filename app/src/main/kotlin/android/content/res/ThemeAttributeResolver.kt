@@ -4,11 +4,8 @@ import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
 import android.util.AttributeSet
 import android.util.TypedValue
-import android.view.ViewGroup
 import android.widget.LinearLayout
-import com.projectcaerus.DrawableParser
-import com.projectcaerus.NinePatchDrawable
-import com.projectcaerus.createStateListDrawable
+import com.projectcaerus.*
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
@@ -29,6 +26,8 @@ open class ThemeAttributeResolver(
     private val stringPool = HashMap<Int, String>()
 
     private val drawableParser = DrawableParser(public)
+    private val dimensionParser = DimensionParser(styles, public, resDirectory)
+    private val textParser = TextParser(public, stringPool)
 
     fun getPooledString(id: Int): CharSequence? {
         return stringPool[id]
@@ -90,44 +89,18 @@ open class ThemeAttributeResolver(
         val style = getStyle(defStyleAttr)
         val indexes = ArrayList<Int>()
 
-        fun loadDimension(dimenName: String) {
-            getAttrIndex(attrs, dimenName)?.let {
-                if (set != null && loadDimension(set, data, dimenName, it)) indexes.add(it)
-            }
-        }
+        dimensionParser.parse2(attrs, indexes, set, data, "layout_margin")
+        dimensionParser.parse2(attrs, indexes, set, data, "layout_width")
+        dimensionParser.parse2(attrs, indexes, set, data, "layout_height")
+        dimensionParser.parse2(attrs, indexes, set, data, "padding")
+        dimensionParser.parse2(attrs, indexes, set, data, "paddingLeft")
+        dimensionParser.parse2(attrs, indexes, set, data, "paddingRight")
+        dimensionParser.parse2(attrs, indexes, set, data, "paddingTop")
+        dimensionParser.parse2(attrs, indexes, set, data, "paddingBottom")
 
-        loadDimension("layout_margin")
-        loadDimension("layout_width")
-        loadDimension("layout_height")
-        loadDimension("padding")
-        loadDimension("paddingLeft")
-        loadDimension("paddingRight")
-        loadDimension("paddingTop")
-        loadDimension("paddingBottom")
-
-        getAttrIndex(attrs, "text")?.let {
-            if (set == null) return@let
-
-            val text = set.getAttributeValue(null, "android:text") ?: ""
-            stringPool[text.hashCode()] = text
-
-            data[6 * it] = TypedValue.TYPE_STRING
-            data[6 * it + 1] = text.hashCode()
-
-            indexes.add(it)
-        }
-
-        getAttrIndex(attrs, "hint")?.let {
-            if (set == null) return@let
-
-            val text = set.getAttributeValue(null, "android:hint") ?: ""
-            stringPool[text.hashCode()] = text
-
-            data[6 * it] = TypedValue.TYPE_STRING
-            data[6 * it + 1] = text.hashCode()
-
-            indexes.add(it)
-        }
+        textParser.parse(attrs, data, indexes, set, "text")
+        textParser.parse(attrs, data, indexes, set, "hint")
+        drawableParser.parser(attrs, data, indexes, style)
 
         getAttrIndex(attrs, "orientation")?.let {
             val textOrientation = set?.getAttributeValue(null, "android:orientation") ?: return@let
@@ -144,10 +117,6 @@ open class ThemeAttributeResolver(
             indexes.add(it)
         }
 
-        getAttrIndex(attrs, "background")?.let {
-            drawableParser.parser(data, indexes, it, style)
-        }
-
         indexes.add(0, indexes.size)
         return TypedArray(resources, data, indexes.toIntArray(), attrs.size);
     }
@@ -161,58 +130,8 @@ open class ThemeAttributeResolver(
         return styles.select("style[name=${styleName.split('/')[1]}]").first()
     }
 
-    fun loadDimension(set: AttributeSet, target: IntArray, dimName: String, index: Int): Boolean {
-        val sizeText = set.getAttributeValue(null, "android:$dimName") ?: return false
-        val size = parserStringToDimension(sizeText)
-
-        if (size >= 0) {
-            target[6 * index] = TypedValue.TYPE_DIMENSION
-            target[6 * index + 1] = (26 shl 8) + (TypedValue.COMPLEX_UNIT_DIP) + (0 shl 4)
-        } else {
-            target[6 * index] = TypedValue.TYPE_FIRST_INT
-            target[6 * index + 1] = size
-        }
-
-        return true
-    }
-
-    private fun parserStringToDimension(sizeText: String): Int {
-        val dipRegex = "([\\d\\.]+)(sp|dip|dp)".toRegex()
-        val themeAttrRegex = "\\?(.+)".toRegex()
-        val resDimenRegex = "@dimen/(.+)".toRegex()
-        val size = when {
-            sizeText in listOf("fill_parent", "match_parent") -> ViewGroup.LayoutParams.MATCH_PARENT
-            sizeText == "wrap_content" -> ViewGroup.LayoutParams.WRAP_CONTENT
-            sizeText.matches(dipRegex) -> dipRegex.find(sizeText)!!.groupValues[1].toFloat().toInt()
-            sizeText.matches(themeAttrRegex) -> getThemeDimensionAttribute(themeAttrRegex.find(sizeText)!!.groupValues[1])
-            sizeText.matches(resDimenRegex) -> getDimenResource(resDimenRegex.find(sizeText)!!.groupValues[1])
-            else -> throw IllegalStateException("Not found action for pattern: $sizeText")
-        }
-        return size
-    }
-
-    private fun getDimenResource(dimenName: String): Int {
-        val dimenRegex = "<dimen name=\"$dimenName\">(.+?)</dimen>".toRegex()
-        val dimenText = File(resDirectory, "values")
-            .listFiles().asSequence()
-            .flatMap { it.readLines().asSequence() }
-            .map { dimenRegex.find(it)?.groupValues?.get(1) }
-            .filterNotNull()
-            .first()
-        return parserStringToDimension(dimenText)
-    }
-
-    private fun getThemeDimensionAttribute(attributeName: String): Int {
-        return parserStringToDimension(getThemeAttribute(attributeName))
-    }
-
     private fun getThemeAttribute(attributeName: String): String {
         return styles.select("style[name=Theme] > item[name=$attributeName]").first().text()
-    }
-
-    private fun getAttrIndex(attrs: IntArray, name: String): Int? {
-        val index = getResource("attr", name)
-        return attrs.indexOf(index).let { if (it >= 0) it else null }
     }
 
     fun getAttributeIndex(name: String): Int {
@@ -221,6 +140,11 @@ open class ThemeAttributeResolver(
 
     fun getDrawableIndex(name: String): Int {
         return getResource("drawable", name)
+    }
+
+    private fun getAttrIndex(attrs: IntArray, name: String): Int? {
+        val index = getResource("attr", name)
+        return attrs.indexOf(index).let { if (it >= 0) it else null }
     }
 
     private fun getResource(type: String, name: String): Int {

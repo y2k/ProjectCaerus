@@ -48,7 +48,7 @@ class ContextFactory {
                     it.arguments[1] as IntArray, 0, 0)
             }
             when_(resources.getDrawable(anyInt())).then {
-                resolver.loadDrawable(it.arguments[0] as TypedValue, it.arguments[0] as Int)
+                resolver.loadDrawable(TypedValue().apply { type=TypedValue.TYPE_REFERENCE }, it.arguments[0] as Int)
             }
 
             when_(resources.getLayout(anyInt())).then {

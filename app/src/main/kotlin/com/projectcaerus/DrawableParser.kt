@@ -11,15 +11,26 @@ import java.util.*
  */
 class DrawableParser(private val public: Document) {
 
-    fun parser(data: IntArray, indexes: ArrayList<Int>, it: Int, style: Element) {
-        val bgStyle = style.select("item[name=background]").first()
-        if (bgStyle != null) {
-            val bgName = bgStyle.text().split('/')[1]
-            val drawableResId = public.select("public[type=drawable][name=$bgName]").first().attrId()
+    fun parser(attrs: IntArray, data: IntArray, indexes: ArrayList<Int>, style: Element) {
+        getAttrIndex(attrs, "background")?.let {
+            val bgStyle = style.select("item[name=background]").first()
+            if (bgStyle != null) {
+                val bgName = bgStyle.text().split('/')[1]
+                val drawableResId = public.select("public[type=drawable][name=$bgName]").first().attrId()
 
-            data[6 * it] = TypedValue.TYPE_REFERENCE
-            data[6 * it + 3] = drawableResId
-            indexes.add(it)
+                data[6 * it] = TypedValue.TYPE_REFERENCE
+                data[6 * it + 3] = drawableResId
+                indexes.add(it)
+            }
         }
+    }
+
+    private fun getAttrIndex(attrs: IntArray, name: String): Int? {
+        val index = getResource("attr", name)
+        return attrs.indexOf(index).let { if (it >= 0) it else null }
+    }
+
+    private fun getResource(type: String, name: String): Int {
+        return public.select("public[type='$type'][name=$name]").first().attrId()
     }
 }
