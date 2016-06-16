@@ -40,7 +40,7 @@ class ContextFactory {
 
             val resolver = ThemeAttributeResolver(resDirectory, resources)
             when_(resources.loadDrawable(any(), anyInt())).then {
-                resolver.loadDrawable(it.arguments[1] as Int)
+                resolver.loadDrawable(it.arguments[0] as TypedValue, it.arguments[1] as Int)
             }
             when_(resources.obtainAttributes(any(), any())).then {
                 resolver.obtainStyledAttributes(
@@ -48,7 +48,7 @@ class ContextFactory {
                     it.arguments[1] as IntArray, 0, 0)
             }
             when_(resources.getDrawable(anyInt())).then {
-                resolver.loadDrawable(it.arguments[0] as Int)
+                resolver.loadDrawable(it.arguments[0] as TypedValue, it.arguments[0] as Int)
             }
 
             when_(resources.getLayout(anyInt())).then {
@@ -93,7 +93,7 @@ class ContextFactory {
 
                 val resolver = ThemeAttributeResolver(resDirectory, resources)
                 when_(resources.loadDrawable(any(), anyInt())).then {
-                    resolver.loadDrawable(it.arguments[1] as Int)
+                    resolver.loadDrawable(it.arguments[0] as TypedValue, it.arguments[1] as Int)
                 }
                 when_(resources.obtainAttributes(any(), any())).then {
                     resolver.obtainStyledAttributes(
@@ -101,7 +101,7 @@ class ContextFactory {
                         it.arguments[1] as IntArray, 0, 0)
                 }
                 when_(resources.getDrawable(anyInt())).then {
-                    resolver.loadDrawable(it.arguments[0] as Int)
+                    resolver.loadDrawable(it.arguments[0] as TypedValue, it.arguments[0] as Int)
                 }
 
                 when_(resources.getLayout(anyInt())).then {
@@ -156,7 +156,7 @@ class ContextFactory {
             }
 
             override fun getDrawable(id: Int): Drawable? {
-                return resolver.loadDrawable(id)
+                return resolver.loadDrawable(TypedValue().apply { type = TypedValue.TYPE_REFERENCE }, id)
             }
 
             override fun getCompatibilityInfo(): CompatibilityInfo? {
@@ -175,8 +175,8 @@ class ContextFactory {
                 }
             }
 
-            override fun loadDrawable(value: TypedValue?, id: Int): Drawable? {
-                return resolver.loadDrawable(id)
+            override fun loadDrawable(value: TypedValue, id: Int): Drawable? {
+                return resolver.loadDrawable(value, id)
             }
         }
 

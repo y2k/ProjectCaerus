@@ -1,10 +1,12 @@
 package android.content.res
 
+import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
 import android.util.AttributeSet
 import android.util.TypedValue
 import android.view.ViewGroup
 import android.widget.LinearLayout
+import com.projectcaerus.DrawableParser
 import com.projectcaerus.NinePatchDrawable
 import com.projectcaerus.createStateListDrawable
 import org.jsoup.Jsoup
@@ -22,14 +24,11 @@ open class ThemeAttributeResolver(
     private val resDirectory: File,
     private val resources: Resources) {
 
-    private val public: Document
-    private val styles: Document
+    private val public = Jsoup.parse(File("../res/values/public.xml").readText(), "", Parser.xmlParser())
+    private val styles = Jsoup.parse(File("../res/values/styles.xml").readText(), "", Parser.xmlParser())
     private val stringPool = HashMap<Int, String>()
 
-    init {
-        public = Jsoup.parse(File("../res/values/public.xml").readText(), "", Parser.xmlParser())
-        styles = Jsoup.parse(File("../res/values/styles.xml").readText(), "", Parser.xmlParser())
-    }
+    private val drawableParser = DrawableParser(public)
 
     fun getPooledString(id: Int): CharSequence? {
         return stringPool[id]
@@ -55,7 +54,11 @@ open class ThemeAttributeResolver(
         return File(File("../res/$type"), "$resName.xml")
     }
 
-    fun loadDrawable(id: Int): Drawable {
+    fun loadDrawable(value: TypedValue, id: Int): Drawable {
+        if (value.type in TypedValue.TYPE_FIRST_COLOR_INT..TypedValue.TYPE_LAST_COLOR_INT) {
+            return ColorDrawable(value.data)
+        }
+
         val bgName = public.select("public[type=drawable][id=${id.toHex()}]").first().attr("name")
         println("bgName = $bgName")
 
@@ -142,15 +145,7 @@ open class ThemeAttributeResolver(
         }
 
         getAttrIndex(attrs, "background")?.let {
-            val bgStyle = style.select("item[name=background]").first()
-            if (bgStyle != null) {
-                val bgName = bgStyle.text().split('/')[1]
-                val bgIndex = public.select("public[type=drawable][name=$bgName]").first().attrId()
-
-                data[6 * it] = TypedValue.TYPE_REFERENCE
-                data[6 * it + 3] = bgIndex
-                indexes.add(it)
-            }
+            drawableParser.parser(data, indexes, it, style)
         }
 
         indexes.add(0, indexes.size)
@@ -198,14 +193,6 @@ open class ThemeAttributeResolver(
 
     private fun getDimenResource(dimenName: String): Int {
         val dimenRegex = "<dimen name=\"$dimenName\">(.+?)</dimen>".toRegex()
-
-//        val test = """    <dimen name="activity_horizontal_margin">16dp</dimen>"""
-//        assert(dimenRegex.find(test)?.groupValues?.get(1) == "16dp")
-
-        File(resDirectory, "values")
-            .listFiles().asSequence()
-            .forEach { println("ITEM: $it") }
-
         val dimenText = File(resDirectory, "values")
             .listFiles().asSequence()
             .flatMap { it.readLines().asSequence() }
@@ -240,8 +227,6 @@ open class ThemeAttributeResolver(
         return public.select("public[type='$type'][name=$name]").first().attrId()
     }
 }
-
-fun makeEmptyTypedArray(resources: Resources) = TypedArray(resources, IntArray(100), intArrayOf(0), 0)
 
 fun Element.attrId(): Int {
     return attr("id").let { Integer.parseInt(it.substring(2), 16) }
