@@ -14,15 +14,13 @@ import org.powermock.modules.junit4.PowerMockRunner
 /**
  * Created by y2k on 11/06/16.
  */
-@RunWith(PowerMockRunner::class)
-@PrepareForTest(Resources.Theme::class, EmojiFactory::class, Resources.Theme::class)
 class LayoutInflateTest {
 
     lateinit var context: Context
 
     @Before
     fun setUp() {
-        context = ContextFactory().makeMock()
+        context = ContextFactory().makeNoPowerMock()
     }
 
     @Test

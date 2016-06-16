@@ -20,11 +20,13 @@ class SampleTest {
 
     @Test
     fun test() {
-        val path = File("../samples/hello-world/app/build/intermediates/classes/debug")
-        assertTrue(path.exists())
+        val appPath = File("../samples/hello-world/app")
+        val resPath = File(appPath, "src/main/res")
+        val classPath = File(appPath, "build/intermediates/classes/debug")
+        assertTrue(classPath.exists())
 
-        val loader = URLClassLoader(arrayOf(path.toURI().toURL()))
-        val context = ContextFactory().makeNoPowerMock(loader)
+        val loader = URLClassLoader(arrayOf(classPath.toURI().toURL()))
+        val context = ContextFactory().makeNoPowerMock(loader, resPath)
 
         val mainClass = loader.loadClass("com.example.helloworld.MainActivity")
         assertNotNull(mainClass)

@@ -4,6 +4,7 @@ import android.graphics.Canvas
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import com.projectcaerus.AwtCanvas
 import com.projectcaerus.Size
 
@@ -27,6 +28,14 @@ open class Activity {
 
     fun dump(screen: Size) {
         dumpTo(screen, AwtCanvas(screen))
+
+        val g = view as ViewGroup
+        g.let {
+            println("$view -> $it [(${it.left}, ${it.top}), (${it.width}, ${it.height})]")
+        }
+        (0..g.childCount - 1).map { g.getChildAt(it) }.forEach {
+            println("$view -> $it [(${it.left}, ${it.top}), (${it.width}, ${it.height})]")
+        }
     }
 
     fun dumpTo(screen: Size, canvas: Canvas) {

@@ -18,7 +18,9 @@ import java.util.*
  * Created by y2k on 6/5/16.
  */
 
-open class ThemeAttributeResolver(private val resources: Resources) {
+open class ThemeAttributeResolver(
+    private val resDirectory: File,
+    private val resources: Resources) {
 
     private val public: Document
     private val styles: Document
@@ -75,9 +77,9 @@ open class ThemeAttributeResolver(private val resources: Resources) {
 
     private fun getPathToResource(resName: String): File {
         return File("../res")
-                .listFiles { s -> s.isDirectory }
-                .flatMap { it.listFiles().toList() }
-                .first { it.nameWithoutExtension.replace(".9", "") == resName }
+            .listFiles { s -> s.isDirectory }
+            .flatMap { it.listFiles().toList() }
+            .first { it.nameWithoutExtension.replace(".9", "") == resName }
     }
 
     fun obtainStyledAttributes(set: AttributeSet?, attrs: IntArray, defStyleAttr: Int, defStyleRes: Int): TypedArray {
@@ -85,18 +87,20 @@ open class ThemeAttributeResolver(private val resources: Resources) {
         val style = getStyle(defStyleAttr)
         val indexes = ArrayList<Int>()
 
-        getAttrIndex(attrs, "layout_width")?.let {
-            if (set == null) return@let
-
-            loadDimension(set, data, "layout_width", it)
-            indexes.add(it)
+        fun loadDimension(dimenName: String) {
+            getAttrIndex(attrs, dimenName)?.let {
+                if (set != null && loadDimension(set, data, dimenName, it)) indexes.add(it)
+            }
         }
-        getAttrIndex(attrs, "layout_height")?.let {
-            if (set == null) return@let
 
-            loadDimension(set, data, "layout_height", it)
-            indexes.add(it)
-        }
+        loadDimension("layout_margin")
+        loadDimension("layout_width")
+        loadDimension("layout_height")
+        loadDimension("padding")
+        loadDimension("paddingLeft")
+        loadDimension("paddingRight")
+        loadDimension("paddingTop")
+        loadDimension("paddingBottom")
 
         getAttrIndex(attrs, "text")?.let {
             if (set == null) return@let
@@ -123,12 +127,12 @@ open class ThemeAttributeResolver(private val resources: Resources) {
         }
 
         getAttrIndex(attrs, "orientation")?.let {
-            if (set == null) return@let
+            val textOrientation = set?.getAttributeValue(null, "android:orientation") ?: return@let
 
-            val orientation = when (set.getAttributeValue(null, "android:orientation")) {
+            val orientation = when (textOrientation) {
                 "horizontal" -> LinearLayout.HORIZONTAL
                 "vertical" -> LinearLayout.VERTICAL
-                else -> throw IllegalStateException()
+                else -> throw IllegalStateException("Orientation: $textOrientation")
             }
 
             data[6 * it] = TypedValue.TYPE_FIRST_INT
@@ -162,8 +166,8 @@ open class ThemeAttributeResolver(private val resources: Resources) {
         return styles.select("style[name=${styleName.split('/')[1]}]").first()
     }
 
-    fun loadDimension(set: AttributeSet, target: IntArray, dimName: String, index: Int) {
-        val sizeText = set.getAttributeValue(null, "android:$dimName")
+    fun loadDimension(set: AttributeSet, target: IntArray, dimName: String, index: Int): Boolean {
+        val sizeText = set.getAttributeValue(null, "android:$dimName") ?: return false
         val size = parserStringToDimension(sizeText)
 
         if (size >= 0) {
@@ -173,19 +177,42 @@ open class ThemeAttributeResolver(private val resources: Resources) {
             target[6 * index] = TypedValue.TYPE_FIRST_INT
             target[6 * index + 1] = size
         }
+
+        return true
     }
 
     private fun parserStringToDimension(sizeText: String): Int {
         val dipRegex = "([\\d\\.]+)(sp|dip|dp)".toRegex()
         val themeAttrRegex = "\\?(.+)".toRegex()
+        val resDimenRegex = "@dimen/(.+)".toRegex()
         val size = when {
             sizeText in listOf("fill_parent", "match_parent") -> ViewGroup.LayoutParams.MATCH_PARENT
             sizeText == "wrap_content" -> ViewGroup.LayoutParams.WRAP_CONTENT
             sizeText.matches(dipRegex) -> dipRegex.find(sizeText)!!.groupValues[1].toFloat().toInt()
             sizeText.matches(themeAttrRegex) -> getThemeDimensionAttribute(themeAttrRegex.find(sizeText)!!.groupValues[1])
-            else -> throw IllegalStateException(sizeText)
+            sizeText.matches(resDimenRegex) -> getDimenResource(resDimenRegex.find(sizeText)!!.groupValues[1])
+            else -> throw IllegalStateException("Not found action for pattern: $sizeText")
         }
         return size
+    }
+
+    private fun getDimenResource(dimenName: String): Int {
+        val dimenRegex = "<dimen name=\"$dimenName\">(.+?)</dimen>".toRegex()
+
+//        val test = """    <dimen name="activity_horizontal_margin">16dp</dimen>"""
+//        assert(dimenRegex.find(test)?.groupValues?.get(1) == "16dp")
+
+        File(resDirectory, "values")
+            .listFiles().asSequence()
+            .forEach { println("ITEM: $it") }
+
+        val dimenText = File(resDirectory, "values")
+            .listFiles().asSequence()
+            .flatMap { it.readLines().asSequence() }
+            .map { dimenRegex.find(it)?.groupValues?.get(1) }
+            .filterNotNull()
+            .first()
+        return parserStringToDimension(dimenText)
     }
 
     private fun getThemeDimensionAttribute(attributeName: String): Int {

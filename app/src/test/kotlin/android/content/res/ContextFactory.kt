@@ -13,13 +13,15 @@ import com.projectcaerus.setFinalField
 import com.projectcaerus.when_
 import org.mockito.Mockito.*
 import org.powermock.api.mockito.PowerMockito
+import java.io.File
 
 /**
  * Created by y2k on 11/06/16.
  */
 class ContextFactory {
 
-    private lateinit var resolver: AppThemeAttributeResolver
+    private val resDirectory = File("../res")
+    private lateinit var resolver: ThemeAttributeResolver
 
     fun make(): Context {
         PowerMockito.mockStatic(EmojiFactory::class.java)
@@ -36,14 +38,14 @@ class ContextFactory {
                 CompatibilityInfo(ApplicationInfo())
             }
 
-            val resolver = ThemeAttributeResolver(resources)
+            val resolver = ThemeAttributeResolver(resDirectory, resources)
             when_(resources.loadDrawable(any(), anyInt())).then {
                 resolver.loadDrawable(it.arguments[1] as Int)
             }
             when_(resources.obtainAttributes(any(), any())).then {
                 resolver.obtainStyledAttributes(
-                        it.arguments[0] as AttributeSet?,
-                        it.arguments[1] as IntArray, 0, 0)
+                    it.arguments[0] as AttributeSet?,
+                    it.arguments[1] as IntArray, 0, 0)
             }
             when_(resources.getDrawable(anyInt())).then {
                 resolver.loadDrawable(it.arguments[0] as Int)
@@ -56,13 +58,13 @@ class ContextFactory {
             resources
         }
 
-        val themeAttributeResolver = ThemeAttributeResolver(context.resources)
+        val themeAttributeResolver = ThemeAttributeResolver(resDirectory, context.resources)
         when_(context.obtainStyledAttributes(any(), any(), anyInt(), anyInt())).then {
             themeAttributeResolver.obtainStyledAttributes(
-                    it.arguments[0] as AttributeSet?,
-                    it.arguments[1] as IntArray,
-                    it.arguments[2] as Int,
-                    it.arguments[3] as Int
+                it.arguments[0] as AttributeSet?,
+                it.arguments[1] as IntArray,
+                it.arguments[2] as Int,
+                it.arguments[3] as Int
             )
         }
 
@@ -82,21 +84,21 @@ class ContextFactory {
                     DisplayMetrics().apply { density = 1f }
                 }
                 setFinalField(resources,
-                        Resources::class.java.getDeclaredField("mMetrics"),
-                        DisplayMetrics().apply { density = 1f })
+                    Resources::class.java.getDeclaredField("mMetrics"),
+                    DisplayMetrics().apply { density = 1f })
 
                 when_(resources.compatibilityInfo).then {
                     CompatibilityInfo(ApplicationInfo())
                 }
 
-                val resolver = ThemeAttributeResolver(resources)
+                val resolver = ThemeAttributeResolver(resDirectory, resources)
                 when_(resources.loadDrawable(any(), anyInt())).then {
                     resolver.loadDrawable(it.arguments[1] as Int)
                 }
                 when_(resources.obtainAttributes(any(), any())).then {
                     resolver.obtainStyledAttributes(
-                            it.arguments[0] as AttributeSet?,
-                            it.arguments[1] as IntArray, 0, 0)
+                        it.arguments[0] as AttributeSet?,
+                        it.arguments[1] as IntArray, 0, 0)
                 }
                 when_(resources.getDrawable(anyInt())).then {
                     resolver.loadDrawable(it.arguments[0] as Int)
@@ -116,13 +118,13 @@ class ContextFactory {
             override fun getTheme(): Resources.Theme {
                 val theme = PowerMockito.mock(Resources.Theme::class.java)
 
-                val themeAttributeResolver = ThemeAttributeResolver(this.resources)
+                val themeAttributeResolver = ThemeAttributeResolver(resDirectory, this.resources)
                 when_(theme.obtainStyledAttributes(any(), any(), anyInt(), anyInt())).then {
                     themeAttributeResolver.obtainStyledAttributes(
-                            it.arguments[0] as AttributeSet?,
-                            it.arguments[1] as IntArray,
-                            it.arguments[2] as Int,
-                            it.arguments[3] as Int
+                        it.arguments[0] as AttributeSet?,
+                        it.arguments[1] as IntArray,
+                        it.arguments[2] as Int,
+                        it.arguments[3] as Int
                     )
                 }
                 return theme
@@ -135,15 +137,15 @@ class ContextFactory {
         return context
     }
 
-    fun makeNoPowerMock(loader: ClassLoader): Context {
-        val assertmanager = object : AssetManager() {
+    fun makeNoPowerMock(loader: ClassLoader? = null, resPath: File? = null): Context {
+        val assertManager = object : AssetManager() {
 
             override fun getPooledString(block: Int, id: Int): CharSequence? {
                 return resolver.getPooledString(id)
             }
         }
 
-        val resources = object : MockResources(assertmanager) {
+        val resources = object : MockResources(assertManager) {
 
             override fun obtainAttributes(set: AttributeSet?, attrs: IntArray): TypedArray? {
                 return resolver.obtainStyledAttributes(set, attrs, 0, 0)
@@ -178,7 +180,7 @@ class ContextFactory {
             }
         }
 
-        resolver = AppThemeAttributeResolver(resources, loader)
+        resolver = if (loader == null) ThemeAttributeResolver(resDirectory, resources) else AppThemeAttributeResolver(resPath!!, resources, loader)
 
         val context = object : MockContext() {
 
