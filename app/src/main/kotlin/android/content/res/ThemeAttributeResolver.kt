@@ -100,7 +100,7 @@ open class ThemeAttributeResolver(
 
         textParser.parse(attrs, data, indexes, set, "text")
         textParser.parse(attrs, data, indexes, set, "hint")
-        drawableParser.parser(attrs, data, indexes, style)
+        drawableParser.parser(attrs, data, indexes, style, set)
 
         getAttrIndex(attrs, "orientation")?.let {
             val textOrientation = set?.getAttributeValue(null, "android:orientation") ?: return@let

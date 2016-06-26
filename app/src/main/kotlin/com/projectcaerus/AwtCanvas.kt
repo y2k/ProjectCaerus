@@ -92,13 +92,18 @@ class AwtCanvas(val size: Size) : Canvas() {
         val s = src ?: Rect(0, 0, bitmap.image.getWidth(null), bitmap.image.getHeight(null))
         val d = dst ?: Rect(0, 0, size.width, size.height)
         canvas.drawImage(bitmap.image,
-                d.left, d.top, d.right, d.bottom,
-                s.left, s.top, s.right, s.bottom,
-                null)
+            d.left, d.top, d.right, d.bottom,
+            s.left, s.top, s.right, s.bottom,
+            null)
     }
 
     override fun setBitmap(bitmap: Bitmap?) {
         val path = File(File(System.getenv("HOME")), "${System.currentTimeMillis()}.png")
         ImageIO.write(image, "png", path)
+    }
+
+    override fun drawColor(color: Int) {
+        canvas.paint = Color(color, true)
+        canvas.fillRect(0, 0, size.width, size.height)
     }
 }
