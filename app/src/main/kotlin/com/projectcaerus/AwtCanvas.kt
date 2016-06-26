@@ -1,12 +1,10 @@
 package com.projectcaerus
 
-import android.graphics.Bitmap
+import android.graphics.*
 import android.graphics.Canvas
 import android.graphics.Paint
-import android.graphics.Rect
+import java.awt.*
 import java.awt.Color
-import java.awt.Font
-import java.awt.Graphics2D
 import java.awt.geom.AffineTransform
 import java.awt.image.BufferedImage
 import java.io.File
@@ -20,11 +18,15 @@ class AwtCanvas(val size: Size) : Canvas() {
 
     private val image: BufferedImage
     private val canvas: Graphics2D
-    private val states = Stack<AffineTransform>()
+    private val states = Stack<StackFrame>()
+    private val empty = Rectangle(0, 0, size.width, size.height)
+
+    private var currentClip: Shape = empty
 
     init {
         image = BufferedImage(size.width, size.height, BufferedImage.TYPE_4BYTE_ABGR)
         canvas = image.createGraphics()
+        canvas.clip = currentClip
     }
 
     override fun getClipBounds(bounds: Rect): Boolean {
@@ -36,21 +38,17 @@ class AwtCanvas(val size: Size) : Canvas() {
     override fun save(): Int {
         println("save")
 
-        states.push(canvas.transform)
+        states.push(StackFrame(canvas.transform, canvas.clip))
         return states.size
     }
 
     override fun clipRect(left: Float, top: Float, right: Float, bottom: Float): Boolean {
-// FIXME:
-//        println("clipRect: left = $left, top = $top, right = $right, bottom = $bottom")
-//        canvas.clipRect(left.toInt(), top.toInt(), (right - left).toInt(), (bottom - top).toInt())
+        currentClip = Rectangle(left.toInt(), top.toInt(), (right - left).toInt(), (bottom - top).toInt())
         return true
     }
 
     override fun clipRect(left: Int, top: Int, right: Int, bottom: Int): Boolean {
-// FIXME:
-//        println("clipRect: left = $left, top = $top, right = $right, bottom = $bottom")
-//        canvas.clipRect(left, top, (right - left), (bottom - top))
+        currentClip = Rectangle(left, top, right - left, bottom - top)
         return true
     }
 
@@ -76,7 +74,10 @@ class AwtCanvas(val size: Size) : Canvas() {
     override fun restore() {
         println("restore")
 
-        canvas.transform = states.pop()
+        states.pop().apply {
+            currentClip = clip
+            canvas.transform = transform
+        }
     }
 
     override fun quickReject(left: Float, top: Float, right: Float, bottom: Float, type: EdgeType?): Boolean {
@@ -85,7 +86,7 @@ class AwtCanvas(val size: Size) : Canvas() {
 
     override fun restoreToCount(index: Int) {
         while (states.size > index) states.pop()
-        canvas.transform = states.pop()
+        canvas.transform = states.pop().transform
     }
 
     override fun drawBitmap(bitmap: Bitmap, src: Rect?, dst: Rect?, paint: Paint?) {
@@ -104,6 +105,11 @@ class AwtCanvas(val size: Size) : Canvas() {
 
     override fun drawColor(color: Int) {
         canvas.paint = Color(color, true)
+
+        canvas.clip = currentClip
         canvas.fillRect(0, 0, size.width, size.height)
+        canvas.clip = empty
     }
+
+    data class StackFrame(val transform: AffineTransform, val clip: Shape)
 }
