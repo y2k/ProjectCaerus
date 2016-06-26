@@ -36,7 +36,7 @@ class DrawableParser(private val public: Document) {
         }
     }
 
-    private fun normalize(it: String) = if (it.length >= 5) it else it.replace("[^#]".toRegex(), "$10")
+    private fun normalize(it: String) = if (it.length >= 5) it else it.replace("([^#])".toRegex(), "$10")
 
     private fun getAttrIndex(attrs: IntArray, name: String): Int? {
         val index = getResource("attr", name)
