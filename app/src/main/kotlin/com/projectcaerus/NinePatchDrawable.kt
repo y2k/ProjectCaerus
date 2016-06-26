@@ -72,6 +72,10 @@ class NinePatchDrawable(path: File) : Drawable() {
         }
     }
 
+    override fun getIntrinsicWidth(): Int = bitmap.width - 2
+
+    override fun getIntrinsicHeight(): Int = bitmap.height - 2
+
     override fun setAlpha(alpha: Int) {
         // Ignore
     }
